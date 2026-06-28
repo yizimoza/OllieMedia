@@ -61,7 +61,7 @@ export default function CategoryNav({ categories, active, onSelect, onHelp, show
   return (
     <nav className="sidebar">
       <div className="sidebar-brand">
-        <img src="/beagle.svg" className="brand-beagle" alt="OllieMedia" />
+        <img src="/ollie.jpg" className="brand-beagle" alt="OllieMedia" />
         <span className="brand-name">OllieMedia</span>
       </div>
 

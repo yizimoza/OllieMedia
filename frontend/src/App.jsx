@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import CategoryNav from './components/CategoryNav';
-import MediaGrid   from './components/MediaGrid';
-import DetailModal from './components/DetailModal';
-import SearchBar   from './components/SearchBar';
-import ViewToggle  from './components/ViewToggle';
-import HelpPage    from './components/HelpPage';
+import CategoryNav  from './components/CategoryNav';
+import MediaGrid    from './components/MediaGrid';
+import DetailModal  from './components/DetailModal';
+import SearchBar    from './components/SearchBar';
+import ViewToggle   from './components/ViewToggle';
+import SortControl  from './components/SortControl';
+import HelpPage     from './components/HelpPage';
 
 export default function App() {
   const [library, setLibrary]           = useState(null);
@@ -17,10 +18,40 @@ export default function App() {
   const [viewMode, setViewMode]         = useState(
     () => localStorage.getItem('om-view') || 'grid'
   );
+  const [sortKey, setSortKey]           = useState(
+    () => localStorage.getItem('om-sort-key') || 'alpha'
+  );
+  const [sortDir, setSortDir]           = useState(
+    () => localStorage.getItem('om-sort-dir') || 'asc'
+  );
 
   function handleViewChange(mode) {
     setViewMode(mode);
     localStorage.setItem('om-view', mode);
+  }
+
+  function handleSortChange(key, dir) {
+    setSortKey(key);
+    setSortDir(dir);
+    localStorage.setItem('om-sort-key', key);
+    localStorage.setItem('om-sort-dir', dir);
+  }
+
+  function sortItems(list) {
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      if (sortKey === 'alpha') {
+        const cmp = a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+        return sortDir === 'asc' ? cmp : -cmp;
+      }
+      let va, vb;
+      if (sortKey === 'year')     { va = a.year          ?? 0; vb = b.year          ?? 0; }
+      if (sortKey === 'episodes') { va = a.files?.length  ?? 0; vb = b.files?.length  ?? 0; }
+      if (sortKey === 'rating')   { va = a.rating         ?? 0; vb = b.rating         ?? 0; }
+      if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          ?? 0; }
+      return sortDir === 'asc' ? va - vb : vb - va;
+    });
+    return sorted;
   }
 
   // Fetch library summary on mount
@@ -48,8 +79,8 @@ export default function App() {
       .catch(() => setLoading(false));
   }, [activeCategory]);
 
-  const filteredItems = items.filter(item =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredItems = sortItems(
+    items.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   function handleCategorySelect(name) {
@@ -76,6 +107,7 @@ export default function App() {
             <header className="content-header">
               <h1 className="category-title">{activeCategory ?? 'Loading…'}</h1>
               <div className="header-controls">
+                <SortControl sortKey={sortKey} sortDir={sortDir} onChange={handleSortChange} />
                 <ViewToggle mode={viewMode} onChange={handleViewChange} />
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
               </div>

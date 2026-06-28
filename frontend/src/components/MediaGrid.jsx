@@ -18,7 +18,7 @@ export default function MediaGrid({ items, loading, viewMode = 'grid', onSelect 
   if (loading) {
     return (
       <div className="grid-status">
-        <img src="/beagle.svg" className="status-beagle" alt="" />
+        <img src="/ollie.jpg" className="status-beagle" alt="" />
         <div className="spinner" />
         <p>Loading…</p>
       </div>
@@ -28,7 +28,7 @@ export default function MediaGrid({ items, loading, viewMode = 'grid', onSelect 
   if (items.length === 0) {
     return (
       <div className="grid-status">
-        <img src="/beagle.svg" className="status-beagle" alt="" />
+        <img src="/ollie.jpg" className="status-beagle" alt="" />
         <p className="empty-msg">No items found.</p>
       </div>
     );

@@ -2,7 +2,7 @@ export default function HelpPage() {
   return (
     <div className="help-page">
       <div className="help-brand">
-        <img src="/beagle.svg" className="help-beagle" alt="OllieMedia" />
+        <img src="/ollie.jpg" className="help-beagle" alt="OllieMedia" />
         <div>
           <h1 className="help-title">OllieMedia</h1>
           <p className="help-subtitle">Setup Guide</p>

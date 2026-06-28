@@ -70,6 +70,10 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
   const posterFile   = isAudio ? findArtwork(itemDir, COVER_NAMES) : findArtwork(itemDir, POSTER_NAMES);
   const backdropFile = isAudio ? null : findArtwork(itemDir, BACKDROP_NAMES);
 
+  // mtime of the item folder — used by "Recently Added" sort on the frontend
+  let mtime = 0;
+  try { mtime = fs.statSync(itemDir).mtimeMs; } catch { /* leave as 0 */ }
+
   const nfo = await findNfo(itemDir);
 
   // Extract year from "Title (Year)" folder naming convention as fallback
@@ -124,6 +128,7 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
     backdrop: backdropFile ? `/art/${relPath}/${backdropFile}` : null,
     files,
     seasons,  // null for non-series; array of { name, files[] } for TV/Anime
+    mtime,    // folder modification time in ms — used for "Recently Added" sort
   };
 }
 
