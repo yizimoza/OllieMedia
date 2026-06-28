@@ -78,8 +78,9 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
   const folderTitle = itemName.replace(/\s*\(\d{4}\)$/, '').trim();
 
   // TV/Anime: collect files grouped by season subfolder.
+  // Music/Podcasts: recurse into subdirectories so nested album folders are found.
   // All other categories: flat file list.
-  const files = listMediaFiles(itemDir, mediaRoot, isSeries);
+  const files = listMediaFiles(itemDir, mediaRoot, isSeries || isAudio);
 
   // Build seasons map for TV/Anime: { "Season 01": [file, ...], ... }
   // Files sitting directly in the show root go into a "specials" bucket.

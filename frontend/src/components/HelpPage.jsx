@@ -1,9 +1,15 @@
 export default function HelpPage() {
   return (
     <div className="help-page">
-      <h1 className="help-title">Setup Guide</h1>
+      <div className="help-brand">
+        <img src="/beagle.svg" className="help-beagle" alt="OllieMedia" />
+        <div>
+          <h1 className="help-title">OllieMedia</h1>
+          <p className="help-subtitle">Setup Guide</p>
+        </div>
+      </div>
       <p className="help-intro">
-        The media browser reads directly from your <code>/volume1/media/</code> folder.
+        OllieMedia reads directly from your <code>/volume1/media/</code> folder.
         Follow the conventions below to get cover art and metadata displaying correctly.
       </p>
 

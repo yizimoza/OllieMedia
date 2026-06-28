@@ -150,6 +150,33 @@ body {
 .search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ── Help page ── */
+.help-brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.help-beagle {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.help-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.help-title {
+  margin-bottom: 0 !important;
+}
+
 .help-page {
   padding: 40px 48px;
   max-width: 860px;
