@@ -98,6 +98,31 @@ export default function HelpPage() {
       </section>
 
       <section className="help-section">
+        <h2>Open Folder (Windows Explorer)</h2>
+        <p>
+          Movie and TV detail panels include an <strong>Open Folder</strong> button. Clicking it
+          copies the UNC path for that item to your clipboard — paste it into the Windows Explorer
+          address bar to jump straight to the folder on your NAS.
+        </p>
+        <p>
+          To enable this, set the <code>SMB_PATH</code> variable in your <code>docker-compose.yml</code>
+          to the SMB root of your media share:
+        </p>
+        <pre className="help-code">{`environment:
+  - SMB_PATH=\\\\192.168.1.120\\media`}</pre>
+        <p>
+          Replace <code>192.168.1.120</code> with your NAS IP and <code>media</code> with
+          your actual share name. On Synology, the share name is usually the folder name
+          you set up in Control Panel → Shared Folders.
+        </p>
+        <p>
+          When you paste the path into Explorer for the first time, Windows will prompt for
+          credentials if the share requires them. Check <em>Remember my credentials</em> to
+          avoid being asked again.
+        </p>
+      </section>
+
+      <section className="help-section">
         <h2>Rescanning</h2>
         <p>
           The library is scanned once when the server starts. After adding new media,

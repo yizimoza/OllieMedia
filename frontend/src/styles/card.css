@@ -21,11 +21,12 @@
 .media-grid::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
 
 /* Grid mode — poster cards.
-   clamp(240px, 12.5%, 100%) means each column is at least 240px wide and at most 1/8
-   of the container, so auto-fill never produces more than 8 columns. */
+   Fixed min/max keeps tiles in the 200–280px range regardless of how many items are
+   on screen. Using a hard max instead of 1fr prevents tiles from stretching to fill
+   an empty row and becoming very wide with broken proportions. */
 .media-grid--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 12.5%, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 280px));
   gap: 20px;
   padding: 24px 32px 32px;
 }
@@ -192,6 +193,8 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
+  min-height: 160px;  /* art never collapses even if flexbox tries to squish it */
+  flex-shrink: 0;
   background: var(--bg-secondary);
   overflow: hidden;
 }

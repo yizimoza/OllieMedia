@@ -11,4 +11,8 @@ services:
     environment:
       - MEDIA_ROOT=/volume1/media
       - PORT=3000
+      # UNC path prefix for the "Open Folder" button in the UI.
+      # Set this to the SMB root of your media share so the button copies a path
+      # Windows Explorer can navigate to directly (e.g. \\192.168.1.120\media).
+      - SMB_PATH=\\192.168.1.120\media
     restart: unless-stopped

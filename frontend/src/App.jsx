@@ -9,6 +9,7 @@ import HelpPage     from './components/HelpPage';
 
 export default function App() {
   const [library, setLibrary]           = useState(null);
+  const [smbPath, setSmbPath]           = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [items, setItems]               = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -60,6 +61,7 @@ export default function App() {
       .then(r => r.json())
       .then(data => {
         setLibrary(data);
+        setSmbPath(data.smbPath || null);
         if (data.categories.length > 0) {
           setActiveCategory(data.categories[0].name);
         }
@@ -123,7 +125,7 @@ export default function App() {
       </main>
 
       {selectedItem && (
-        <DetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+        <DetailModal item={selectedItem} smbPath={smbPath} onClose={() => setSelectedItem(null)} />
       )}
     </div>
   );

@@ -62,7 +62,8 @@ app.get('/api/library', async (req, res) => {
       name,
       count: items.length,
     }));
-    res.json({ categories, lastScan: lastScanTime });
+    // smbPath lets the frontend build UNC paths for the "Open Folder" button
+    res.json({ categories, lastScan: lastScanTime, smbPath: process.env.SMB_PATH || null });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

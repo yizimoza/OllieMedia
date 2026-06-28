@@ -180,7 +180,34 @@ function SeasonSection({ season, showPath }) {
   );
 }
 
-export default function DetailModal({ item, onClose }) {
+// Copies the UNC path for this item to the clipboard so the user can paste it
+// into Windows Explorer. Direct file:// links to UNC paths are blocked by browsers.
+function OpenFolderBtn({ itemPath, smbPath }) {
+  const [copied, setCopied] = useState(false);
+  if (!smbPath) return null;
+
+  // Build \\server\share\Category\Title from the forward-slash relative path
+  const uncPath = smbPath.replace(/\//g, '\\') + '\\' + itemPath.replace(/\//g, '\\');
+
+  function handleClick() {
+    navigator.clipboard.writeText(uncPath).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    });
+  }
+
+  return (
+    <button className="open-folder-btn" onClick={handleClick} title={uncPath}>
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none"
+        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+      </svg>
+      {copied ? 'Path copied!' : 'Open Folder'}
+    </button>
+  );
+}
+
+export default function DetailModal({ item, smbPath, onClose }) {
   // Close on Escape key
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose(); };
@@ -231,6 +258,9 @@ export default function DetailModal({ item, onClose }) {
 
         {/* Body */}
         <div className="modal-body">
+          {!isAudio && (
+            <OpenFolderBtn itemPath={item.path} smbPath={smbPath} />
+          )}
           {item.studio && <p className="modal-studio">{item.studio}</p>}
           {item.plot   && <p className="modal-plot">{item.plot}</p>}
 

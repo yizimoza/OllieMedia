@@ -173,6 +173,30 @@
   gap: 16px;
 }
 
+/* Open Folder button — copies UNC path to clipboard */
+.open-folder-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  align-self: flex-start;
+}
+
+.open-folder-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .modal-studio {
   font-size: 0.8rem;
   color: var(--text-muted);
