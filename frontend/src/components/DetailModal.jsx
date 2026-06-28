@@ -221,10 +221,12 @@ export default function DetailModal({ item, smbPath, onClose }) {
     <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal-panel" role="dialog" aria-modal="true" aria-label={item.title}>
 
-        {/* Backdrop hero */}
+        {/* Backdrop hero — uses backdrop, falls back to thumb if available */}
         <div
           className="modal-hero"
-          style={item.backdrop ? { backgroundImage: `url(${item.backdrop})` } : {}}
+          style={(item.backdrop || item.thumb)
+            ? { backgroundImage: `url(${item.backdrop || item.thumb})` }
+            : {}}
         >
           <div className="modal-hero-gradient" />
           <button className="modal-close" onClick={onClose} aria-label="Close">
@@ -240,7 +242,11 @@ export default function DetailModal({ item, smbPath, onClose }) {
           )}
 
           <div className="modal-hero-text">
-            <h2 className="modal-title">{item.title}</h2>
+            {/* Use clearlogo/logo image as title if available, otherwise plain text */}
+            {item.logo
+              ? <img className="modal-logo" src={item.logo} alt={item.title} />
+              : <h2 className="modal-title">{item.title}</h2>
+            }
             <div className="modal-meta-row">
               {item.year    && <span className="meta-tag">{item.year}</span>}
               {item.runtime && <span className="meta-tag">{item.runtime} min</span>}
@@ -255,6 +261,10 @@ export default function DetailModal({ item, smbPath, onClose }) {
 
         {/* Body */}
         <div className="modal-body">
+          {/* Banner image — full-width decorative header art, shown if available */}
+          {item.banner && (
+            <img className="modal-banner" src={item.banner} alt="" aria-hidden="true" />
+          )}
           {!isAudio && (
             <OpenFolderBtn itemPath={item.path} smbPath={smbPath} />
           )}

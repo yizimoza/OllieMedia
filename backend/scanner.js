@@ -8,9 +8,12 @@ const AUDIO_EXTS = new Set(['.mp3', '.flac', '.m4a', '.aac', '.ogg', '.wav', '.o
 const MEDIA_EXTS = new Set([...VIDEO_EXTS, ...AUDIO_EXTS]);
 
 // Artwork filenames checked in priority order
-const POSTER_NAMES  = ['poster.jpg',  'poster.jpeg',  'poster.png',  'folder.jpg'];
+const POSTER_NAMES   = ['poster.jpg',  'poster.jpeg',  'poster.png',  'folder.jpg'];
 const BACKDROP_NAMES = ['backdrop.jpg', 'backdrop.jpeg', 'backdrop.png', 'fanart.jpg', 'fanart.png'];
-const COVER_NAMES   = ['cover.jpg',   'cover.jpeg',   'cover.png',   'folder.jpg'];
+const COVER_NAMES    = ['cover.jpg',   'cover.jpeg',   'cover.png',   'folder.jpg'];
+const BANNER_NAMES   = ['banner.jpg',  'banner.jpeg',  'banner.png'];
+const LOGO_NAMES     = ['clearlogo.png', 'logo.png',   'clearart.png', 'logo.jpg'];
+const THUMB_NAMES    = ['thumb.jpg',   'landscape.jpg', 'thumb.jpeg',  'landscape.png'];
 
 // Return the first matching artwork filename found in dirPath, or null
 function findArtwork(dirPath, candidates) {
@@ -67,8 +70,11 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
   const isAudio = cat === 'music' || cat === 'podcasts';
   const isSeries = cat === 'tv' || cat === 'anime';
 
-  const posterFile   = isAudio ? findArtwork(itemDir, COVER_NAMES) : findArtwork(itemDir, POSTER_NAMES);
-  const backdropFile = isAudio ? null : findArtwork(itemDir, BACKDROP_NAMES);
+  const posterFile   = isAudio ? findArtwork(itemDir, COVER_NAMES)    : findArtwork(itemDir, POSTER_NAMES);
+  const backdropFile = isAudio ? null                                  : findArtwork(itemDir, BACKDROP_NAMES);
+  const bannerFile   = isAudio ? null                                  : findArtwork(itemDir, BANNER_NAMES);
+  const logoFile     = isAudio ? null                                  : findArtwork(itemDir, LOGO_NAMES);
+  const thumbFile    = isAudio ? null                                  : findArtwork(itemDir, THUMB_NAMES);
 
   // mtime of the item folder — used by "Recently Added" sort on the frontend
   let mtime = 0;
@@ -126,6 +132,9 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
     path:     relPath,
     poster:   posterFile   ? `/art/${relPath}/${posterFile}`   : null,
     backdrop: backdropFile ? `/art/${relPath}/${backdropFile}` : null,
+    banner:   bannerFile   ? `/art/${relPath}/${bannerFile}`   : null,
+    logo:     logoFile     ? `/art/${relPath}/${logoFile}`     : null,
+    thumb:    thumbFile    ? `/art/${relPath}/${thumbFile}`    : null,
     files,
     seasons,  // null for non-series; array of { name, files[] } for TV/Anime
     mtime,    // folder modification time in ms — used for "Recently Added" sort
