@@ -94,10 +94,10 @@ app.get('/api/play', (req, res) => {
 
   const m3u = `#EXTM3U\n#EXTINF:-1,${filename}\n${mediaUrl}\n`;
 
-  // No Content-Disposition: attachment — the browser downloads the tiny file silently
-  // and shows an "Open" notification. First click: Open → VLC → tick "Always open files
-  // of this type". After that VLC launches automatically on every Play click.
+  // inline (not attachment) skips the Save dialog; the .m3u extension lets Windows
+  // hand the file to VLC automatically if VLC is the default .m3u handler.
   res.setHeader('Content-Type', 'audio/x-mpegurl');
+  res.setHeader('Content-Disposition', `inline; filename="${filename}.m3u"`);
   res.send(m3u);
 });
 
@@ -123,7 +123,10 @@ app.get('/api/season-pack', async (req, res) => {
       lines.push(`${origin}/media/${f.path}`);
     }
 
+    // Safe filename: strip characters not allowed in Windows filenames
+    const safeName = `${item.title} - ${req.query.season}`.replace(/[\\/:*?"<>|]/g, '_');
     res.setHeader('Content-Type', 'audio/x-mpegurl');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}.m3u"`);
     res.send(lines.join('\n') + '\n');
   } catch (err) {
     res.status(500).json({ error: err.message });
