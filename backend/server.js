@@ -81,6 +81,24 @@ app.get('/api/item', async (req, res) => {
   }
 });
 
+// GET /api/play?path=... — returns an M3U playlist pointing at the media file's HTTP URL.
+// The browser downloads the tiny .m3u file; VLC (set as default .m3u handler) opens it
+// and streams the file directly from this server.
+app.get('/api/play', (req, res) => {
+  if (!req.query.path) return res.status(400).json({ error: 'Missing ?path= parameter' });
+
+  // Build the full HTTP URL to the media file using the incoming request's host header
+  // so the playlist works regardless of what IP or hostname the client used to reach us.
+  const mediaUrl = `${req.protocol}://${req.get('host')}/media/${req.query.path}`;
+  const filename = path.basename(req.query.path);
+
+  const m3u = `#EXTM3U\n#EXTINF:-1,${filename}\n${mediaUrl}\n`;
+
+  res.setHeader('Content-Type', 'audio/x-mpegurl');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.m3u"`);
+  res.send(m3u);
+});
+
 // POST /api/rescan — drop cache and rebuild
 app.post('/api/rescan', async (req, res) => {
   try {
