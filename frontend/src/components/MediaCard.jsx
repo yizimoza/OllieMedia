@@ -57,8 +57,19 @@ function GridCard({ item, onClick, isAudio }) {
           </div>
         </div>
         <div className="card-overlay">
-          {item.year   && <span className="card-year">{item.year}</span>}
-          {item.rating && <span className="card-rating">{STAR}{item.rating.toFixed(1)}</span>}
+          <p className="hover-title">{item.title}</p>
+          <div className="hover-meta">
+            {item.year    && <span className="hover-year">{item.year}</span>}
+            {item.rating  && <span className="hover-rating">{STAR}{item.rating.toFixed(1)}</span>}
+            {item.runtime && <span className="hover-runtime">{item.runtime}m</span>}
+          </div>
+          {item.genres.length > 0 && (
+            <div className="hover-genres">
+              {item.genres.slice(0, 3).map(g => (
+                <span key={g} className="hover-genre">{g}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="card-info">

@@ -237,40 +237,73 @@
   opacity: 0.4;
 }
 
-/* Year + rating overlay on hover */
+/* Hover info panel — slides up from the bottom of the poster */
 .card-overlay {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  padding: 28px 8px 8px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.75));
+  padding: 64px 12px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.80) 55%, transparent 100%);
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
   opacity: 0;
-  transition: opacity var(--transition);
+  transform: translateY(6px);
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
-.media-grid--grid .media-card:hover .card-overlay { opacity: 1; }
-
-.card-year, .card-rating {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 4px;
-  backdrop-filter: blur(4px);
+.media-grid--grid .media-card:hover .card-overlay {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.card-year {
-  background: rgba(0,0,0,0.6);
-  color: var(--text-secondary);
+.hover-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.card-rating {
-  background: rgba(229,192,123,0.2);
+.hover-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hover-year {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.hover-rating {
+  font-size: 0.75rem;
   color: var(--accent);
   display: flex;
   align-items: center;
   gap: 3px;
+}
+
+.hover-runtime {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.hover-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.hover-genre {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
 }
 
 /* Title below artwork — always visible */
