@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import MediaCard from './MediaCard';
 import ShelfView from './ShelfView';
+import RecentlyAddedView from './RecentlyAddedView';
 import '../styles/card.css';
 
 const PAGE_SIZES = [10, 25, 50];
@@ -37,9 +38,8 @@ export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSe
     );
   }
 
-  if (viewMode === 'shelf') {
-    return <ShelfView items={items} onSelect={onSelect} />;
-  }
+  if (viewMode === 'shelf')  return <ShelfView          items={items} onSelect={onSelect} />;
+  if (viewMode === 'recent') return <RecentlyAddedView               onSelect={onSelect} />;
 
   const paginate = PAGINATED.has(viewMode);
   const totalPages = paginate ? Math.ceil(items.length / pageSize) : 1;

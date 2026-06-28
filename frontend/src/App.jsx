@@ -29,7 +29,7 @@ export default function App() {
   const [viewMode, setViewMode]         = useState(
     () => {
       const saved = localStorage.getItem('om-view');
-      const valid = ['spotlight', 'flip', 'shelf', 'row', 'list'];
+      const valid = ['recent', 'flip', 'spotlight', 'shelf', 'row', 'list'];
       return valid.includes(saved) ? saved : 'spotlight';
     }
   );
@@ -122,7 +122,9 @@ if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          
         ) : (
           <>
             <header className="content-header">
-              <h1 className="category-title">{activeCategory ?? 'Loading…'}</h1>
+              <h1 className="category-title">
+                {viewMode === 'recent' ? 'Recently Added' : (activeCategory ?? 'Loading…')}
+              </h1>
               <div className="header-controls">
                 <SortControl sortKey={sortKey} sortDir={sortDir} onChange={handleSortChange} />
                 <ViewToggle mode={viewMode} onChange={handleViewChange} />

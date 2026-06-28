@@ -225,6 +225,29 @@ app.get('/api/album-download', async (req, res) => {
   }
 });
 
+// GET /api/recently-added?limit=5 — most recently added items across all visual media categories.
+// Music and Podcasts are excluded since their mtime semantics differ (album folders vs files).
+app.get('/api/recently-added', async (req, res) => {
+  try {
+    const lib = await ensureLibrary();
+    const limit = Math.min(parseInt(req.query.limit, 10) || 5, 20);
+    const skip  = new Set(['music', 'podcasts']);
+
+    const all = [];
+    for (const [catName, items] of Object.entries(lib)) {
+      if (skip.has(catName.toLowerCase())) continue;
+      for (const item of items) {
+        all.push({ ...item, category: catName });
+      }
+    }
+
+    all.sort((a, b) => (b.mtime || 0) - (a.mtime || 0));
+    res.json({ items: all.slice(0, limit) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/rescan — force an immediate rescan (same logic as the auto interval)
 app.post('/api/rescan', async (req, res) => {
   try {

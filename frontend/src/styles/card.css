@@ -1,3 +1,151 @@
+/* ═══════════════════════════════════════════════
+   RECENTLY ADDED VIEW
+   Large hero cards, one per recent item, with
+   backdrop as background and poster on the left.
+   ═══════════════════════════════════════════════ */
+.recent-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-hover) transparent;
+}
+
+.recent-container::-webkit-scrollbar       { width: 6px; }
+.recent-container::-webkit-scrollbar-track { background: transparent; }
+.recent-container::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
+
+.recent-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.recent-card {
+  position: relative;
+  width: 100%;
+  min-height: 170px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center top;
+  background-color: var(--bg-card);
+  padding: 0;
+  text-align: left;
+  flex-shrink: 0;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.recent-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  border-color: var(--border-accent);
+}
+
+/* Dark gradient scrim so text stays readable over any backdrop image */
+.recent-card-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.75) 45%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+}
+
+.recent-card-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 20px 28px;
+  min-height: 170px;
+}
+
+.recent-card-poster {
+  width: 85px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.recent-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-card-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recent-category-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.recent-year {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.recent-card-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recent-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recent-genre {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.recent-plot {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 680px;
+}
+
 /* ── Grid wrapper — holds the scrollable grid and the pagination bar ── */
 .grid-wrapper {
   flex: 1;
