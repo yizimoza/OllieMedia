@@ -93,19 +93,21 @@ export default function DetailModal({ item, onClose }) {
                         />
                       )}
 
-                      {/* Video: Play (VLC via M3U) + Download */}
-                      {!isAudio && (
-                        <a
-                          className="play-btn"
-                          href={`/api/play?path=${encodeURIComponent(f.path)}`}
-                          title="Open in VLC via M3U playlist"
-                        >
-                          <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                          Play
-                        </a>
-                      )}
+                      {/* Video: Play via vlc:// protocol handler.
+                          VLC registers this scheme on install; the browser shows
+                          an "Open with VLC?" prompt (tick "always allow" once). */}
+                      {!isAudio && (() => {
+                        const encodedPath = f.path.split('/').map(encodeURIComponent).join('/');
+                        const vlcUrl = `vlc://${window.location.origin}/media/${encodedPath}`;
+                        return (
+                          <a className="play-btn" href={vlcUrl} title="Open in VLC">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            Play
+                          </a>
+                        );
+                      })()}
 
                       {/* Download — always shown */}
                       <a
