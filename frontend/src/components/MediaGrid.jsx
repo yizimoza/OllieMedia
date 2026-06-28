@@ -1,7 +1,7 @@
 import MediaCard from './MediaCard';
 import '../styles/card.css';
 
-export default function MediaGrid({ items, loading, onSelect }) {
+export default function MediaGrid({ items, loading, viewMode = 'grid', onSelect }) {
   if (loading) {
     return (
       <div className="grid-status">
@@ -20,9 +20,9 @@ export default function MediaGrid({ items, loading, onSelect }) {
   }
 
   return (
-    <div className="media-grid">
+    <div className={`media-grid media-grid--${viewMode}`}>
       {items.map(item => (
-        <MediaCard key={item.id} item={item} onClick={() => onSelect(item)} />
+        <MediaCard key={item.id} item={item} viewMode={viewMode} onClick={() => onSelect(item)} />
       ))}
     </div>
   );

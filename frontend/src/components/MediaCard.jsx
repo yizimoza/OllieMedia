@@ -1,17 +1,39 @@
 import '../styles/card.css';
 
-// Placeholder shown when no poster artwork is available
-function Placeholder({ title }) {
+const STAR = (
+  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+// Small thumbnail used in row + list views
+function Thumb({ poster, title, className }) {
   return (
-    <div className="card-placeholder">
-      <span className="placeholder-initial">{title.charAt(0).toUpperCase()}</span>
+    <div className={className}>
+      {poster ? (
+        <img
+          src={poster}
+          alt={title}
+          loading="lazy"
+          onError={e => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextSibling.style.display = 'flex';
+          }}
+        />
+      ) : null}
+      <div
+        className="thumb-placeholder"
+        style={{ display: poster ? 'none' : 'flex' }}
+        aria-hidden="true"
+      >
+        {title.charAt(0).toUpperCase()}
+      </div>
     </div>
   );
 }
 
-export default function MediaCard({ item, onClick }) {
-  const isAudio = item.category === 'Music' || item.category === 'Podcasts';
-
+// ── Grid card (poster dominant, 2:3 aspect ratio) ───────────────────────────
+function GridCard({ item, onClick, isAudio }) {
   return (
     <button className="media-card" onClick={onClick} aria-label={`Open ${item.title}`}>
       <div className="card-art">
@@ -21,33 +43,24 @@ export default function MediaCard({ item, onClick }) {
             alt={item.title}
             loading="lazy"
             onError={e => {
-              // If the image fails to load, swap in the placeholder
               e.currentTarget.style.display = 'none';
               e.currentTarget.nextSibling.style.display = 'flex';
             }}
           />
         ) : null}
-        {/* Placeholder: visible immediately when no poster, or as fallback on img error */}
         <div
           className="card-placeholder-wrap"
           style={{ display: item.poster ? 'none' : 'flex' }}
         >
-          <Placeholder title={item.title} />
+          <div className="card-placeholder">
+            <span className="placeholder-initial">{item.title.charAt(0).toUpperCase()}</span>
+          </div>
         </div>
-
         <div className="card-overlay">
-          {item.year && <span className="card-year">{item.year}</span>}
-          {item.rating && (
-            <span className="card-rating">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              {item.rating.toFixed(1)}
-            </span>
-          )}
+          {item.year   && <span className="card-year">{item.year}</span>}
+          {item.rating && <span className="card-rating">{STAR}{item.rating.toFixed(1)}</span>}
         </div>
       </div>
-
       <div className="card-info">
         <p className="card-title">{item.title}</p>
         {isAudio && item.files.length > 0 && (
@@ -56,4 +69,52 @@ export default function MediaCard({ item, onClick }) {
       </div>
     </button>
   );
+}
+
+// ── Row card (thumbnail left, metadata right) ────────────────────────────────
+function RowCard({ item, onClick }) {
+  return (
+    <button className="media-card media-card--row" onClick={onClick} aria-label={`Open ${item.title}`}>
+      <Thumb poster={item.poster} title={item.title} className="card-row-thumb" />
+      <div className="card-row-body">
+        <p className="card-row-title">{item.title}</p>
+        <div className="card-row-meta">
+          {item.year   && <span>{item.year}</span>}
+          {item.rating && <span className="card-row-rating">{STAR}{item.rating.toFixed(1)}</span>}
+          {item.runtime && <span>{item.runtime} min</span>}
+        </div>
+        {item.genres.length > 0 && (
+          <p className="card-row-genres">{item.genres.slice(0, 3).join(' · ')}</p>
+        )}
+        {item.plot && <p className="card-row-plot">{item.plot}</p>}
+      </div>
+    </button>
+  );
+}
+
+// ── List card (ultra-compact rows) ──────────────────────────────────────────
+function ListCard({ item, onClick }) {
+  return (
+    <button className="media-card media-card--list" onClick={onClick} aria-label={`Open ${item.title}`}>
+      <Thumb poster={item.poster} title={item.title} className="card-list-thumb" />
+      <p className="card-list-title">{item.title}</p>
+      {item.genres.length > 0 && (
+        <p className="card-list-genre">{item.genres[0]}</p>
+      )}
+      {item.year && <span className="card-list-year">{item.year}</span>}
+      {item.rating && (
+        <span className="card-list-rating">{STAR}{item.rating.toFixed(1)}</span>
+      )}
+    </button>
+  );
+}
+
+// ── Root export ──────────────────────────────────────────────────────────────
+export default function MediaCard({ item, viewMode = 'grid', onClick }) {
+  const cat = item.category ? item.category.toLowerCase() : '';
+  const isAudio = cat === 'music' || cat === 'podcasts';
+
+  if (viewMode === 'row')  return <RowCard  item={item} onClick={onClick} />;
+  if (viewMode === 'list') return <ListCard item={item} onClick={onClick} />;
+  return <GridCard item={item} onClick={onClick} isAudio={isAudio} />;
 }

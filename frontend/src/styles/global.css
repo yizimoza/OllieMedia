@@ -70,6 +70,46 @@ body {
   color: var(--text-primary);
 }
 
+/* ── Header right-hand controls (view toggle + search) ── */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── View toggle buttons ── */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  padding: 0;
+}
+
+.view-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+
+.view-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
 /* ── Search bar ── */
 .search-wrap {
   position: relative;

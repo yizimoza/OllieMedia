@@ -3,6 +3,7 @@ import CategoryNav from './components/CategoryNav';
 import MediaGrid   from './components/MediaGrid';
 import DetailModal from './components/DetailModal';
 import SearchBar   from './components/SearchBar';
+import ViewToggle  from './components/ViewToggle';
 import HelpPage    from './components/HelpPage';
 
 export default function App() {
@@ -13,6 +14,14 @@ export default function App() {
   const [searchQuery, setSearchQuery]   = useState('');
   const [loading, setLoading]           = useState(false);
   const [showHelp, setShowHelp]         = useState(false);
+  const [viewMode, setViewMode]         = useState(
+    () => localStorage.getItem('om-view') || 'grid'
+  );
+
+  function handleViewChange(mode) {
+    setViewMode(mode);
+    localStorage.setItem('om-view', mode);
+  }
 
   // Fetch library summary on mount
   useEffect(() => {
@@ -66,11 +75,15 @@ export default function App() {
           <>
             <header className="content-header">
               <h1 className="category-title">{activeCategory ?? 'Loading…'}</h1>
-              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+              <div className="header-controls">
+                <ViewToggle mode={viewMode} onChange={handleViewChange} />
+                <SearchBar value={searchQuery} onChange={setSearchQuery} />
+              </div>
             </header>
             <MediaGrid
               items={filteredItems}
               loading={loading}
+              viewMode={viewMode}
               onSelect={setSelectedItem}
             />
           </>
