@@ -87,10 +87,12 @@ function SeasonSection({ season, showPath }) {
           {season.name}
           <span className="season-ep-count">{season.files.length} ep</span>
         </button>
-        <div className="season-actions">
-          <PlaySeasonBtn showPath={showPath} seasonName={season.name} />
-          <DownloadSeasonBtn showPath={showPath} seasonName={season.name} />
-        </div>
+        {season.files.length > 1 && (
+          <div className="season-actions">
+            <PlaySeasonBtn showPath={showPath} seasonName={season.name} />
+            <DownloadSeasonBtn showPath={showPath} seasonName={season.name} />
+          </div>
+        )}
       </div>
 
       {open && (
