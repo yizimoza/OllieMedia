@@ -32,13 +32,27 @@ app.use('/art', express.static(MEDIA_ROOT, { dotfiles: 'ignore' }));
 let libraryCache = null;
 let lastScanTime = null;
 
-async function ensureLibrary() {
-  if (!libraryCache) {
+async function rescan() {
+  try {
     libraryCache = await buildLibrary(MEDIA_ROOT);
     lastScanTime = new Date().toISOString();
+    const total = Object.values(libraryCache).reduce((n, items) => n + items.length, 0);
+    console.log(`[library] Scan complete — ${total} items (${lastScanTime})`);
+  } catch (err) {
+    console.error('[library] Scan failed:', err.message);
   }
+}
+
+async function ensureLibrary() {
+  if (!libraryCache) await rescan();
   return libraryCache;
 }
+
+// Scan on startup so the library is ready before the first request
+rescan();
+
+// Re-scan every 60 seconds to pick up newly added files automatically
+setInterval(rescan, 60_000);
 
 // GET /api/library — category names and item counts
 app.get('/api/library', async (req, res) => {
@@ -172,14 +186,11 @@ app.get('/api/season-download', async (req, res) => {
   }
 });
 
-// POST /api/rescan — drop cache and rebuild
+// POST /api/rescan — force an immediate rescan (same logic as the auto interval)
 app.post('/api/rescan', async (req, res) => {
   try {
-    libraryCache = null;
-    const lib = await buildLibrary(MEDIA_ROOT);
-    libraryCache = lib;
-    lastScanTime = new Date().toISOString();
-    const categories = Object.entries(lib).map(([name, items]) => ({
+    await rescan();
+    const categories = Object.entries(libraryCache).map(([name, items]) => ({
       name,
       count: items.length,
     }));
