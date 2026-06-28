@@ -8,6 +8,16 @@ import SortControl  from './components/SortControl';
 import HelpPage     from './components/HelpPage';
 
 export default function App() {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('om-theme') || 'dark'
+  );
+
+  // Apply the theme attribute to <html> so CSS variables cascade everywhere
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('om-theme', theme);
+  }, [theme]);
+
   const [library, setLibrary]           = useState(null);
   const [smbPath, setSmbPath]           = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -102,6 +112,8 @@ if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          
         onSelect={handleCategorySelect}
         onHelp={() => { setShowHelp(true); setSelectedItem(null); }}
         showHelp={showHelp}
+        theme={theme}
+        onThemeChange={setTheme}
       />
 
       <main className="main-content">

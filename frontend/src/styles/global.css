@@ -1,5 +1,6 @@
-/* Design tokens */
-:root {
+/* ── Design tokens — Dark theme (default) ── */
+:root,
+[data-theme="dark"] {
   --bg-primary:    #0a0a0f;
   --bg-secondary:  #0f0f1a;
   --bg-card:       #141420;
@@ -17,6 +18,38 @@
   --radius-lg:     16px;
   --sidebar-w:     220px;
   --transition:    180ms ease;
+}
+
+/* ── Light theme ── */
+[data-theme="light"] {
+  --bg-primary:    #f4f4f7;
+  --bg-secondary:  #eaeaef;
+  --bg-card:       #ffffff;
+  --bg-hover:      #e0e0e8;
+  --accent:        #7c5a2a;
+  --accent-dim:    rgba(124, 90, 42, 0.1);
+  --accent-glow:   rgba(124, 90, 42, 0.2);
+  --text-primary:  #1a1a2e;
+  --text-secondary:#555570;
+  --text-muted:    #9999b3;
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(124, 90, 42, 0.35);
+}
+
+/* ── Beagle theme — warm browns and tans ── */
+[data-theme="beagle"] {
+  --bg-primary:    #1e1208;
+  --bg-secondary:  #271a0c;
+  --bg-card:       #33200f;
+  --bg-hover:      #3f2a14;
+  --accent:        #c8864a;
+  --accent-dim:    rgba(200, 134, 74, 0.15);
+  --accent-glow:   rgba(200, 134, 74, 0.28);
+  --text-primary:  #f4e4cc;
+  --text-secondary:#c4956a;
+  --text-muted:    #7a5a3a;
+  --border:        rgba(200, 134, 74, 0.14);
+  --border-accent: rgba(200, 134, 74, 0.45);
 }
 
 *, *::before, *::after {
