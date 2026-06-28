@@ -3,21 +3,6 @@ import '../styles/modal.css';
 
 const AUDIO_EXTS = new Set(['mp3', 'flac', 'm4a', 'aac', 'ogg', 'wav', 'opus']);
 
-function StarRating({ rating }) {
-  const stars = Math.round(rating / 2); // convert 0-10 → 0-5
-  return (
-    <span className="star-rating">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} viewBox="0 0 24 24" width="14" height="14"
-          fill={i < stars ? 'currentColor' : 'none'}
-          stroke="currentColor" strokeWidth="1.5">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ))}
-      <span className="rating-num">{rating.toFixed(1)}</span>
-    </span>
-  );
-}
 
 // Play button — links to M3U endpoint so VLC streams directly from the server.
 // First click: browser shows "Open" in the download bar → pick VLC → tick
@@ -259,7 +244,6 @@ export default function DetailModal({ item, smbPath, onClose }) {
             <div className="modal-meta-row">
               {item.year    && <span className="meta-tag">{item.year}</span>}
               {item.runtime && <span className="meta-tag">{item.runtime} min</span>}
-              {item.rating  && <StarRating rating={item.rating} />}
             </div>
             {item.genres.length > 0 && (
               <div className="modal-genres">

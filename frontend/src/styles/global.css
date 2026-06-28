@@ -34,7 +34,8 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  overflow: hidden; /* Sidebar layout; main scrolls independently */
+  overflow-y: hidden; /* Sidebar layout; main scrolls independently */
+  overflow-x: auto;  /* Allow horizontal scroll at extreme zoom instead of collapsing */
 }
 
 /* ── App shell ── */
@@ -42,6 +43,9 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  /* Prevents the layout from compressing below a usable width at extreme browser zoom.
+     The body's overflow-x:auto kicks in and shows a horizontal scrollbar instead. */
+  min-width: 540px;
 }
 
 /* ── Main content area ── */

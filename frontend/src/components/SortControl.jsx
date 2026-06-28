@@ -2,7 +2,6 @@ const SORT_OPTIONS = [
   { value: 'alpha',    label: 'Alphabetical' },
   { value: 'year',     label: 'Year' },
   { value: 'episodes', label: 'Episodes' },
-  { value: 'rating',   label: 'Rating' },
   { value: 'mtime',    label: 'Recently Added' },
 ];
 

@@ -1,10 +1,5 @@
 import '../styles/card.css';
 
-const STAR = (
-  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
-);
 
 // Small thumbnail used in row + list views
 function Thumb({ poster, title, className }) {
@@ -60,7 +55,6 @@ function GridCard({ item, onClick, isAudio }) {
           <p className="hover-title">{item.title}</p>
           <div className="hover-meta">
             {item.year    && <span className="hover-year">{item.year}</span>}
-            {item.rating  && <span className="hover-rating">{STAR}{item.rating.toFixed(1)}</span>}
             {item.runtime && <span className="hover-runtime">{item.runtime}m</span>}
           </div>
           {item.genres.length > 0 && (
@@ -90,8 +84,7 @@ function RowCard({ item, onClick }) {
       <div className="card-row-body">
         <p className="card-row-title">{item.title}</p>
         <div className="card-row-meta">
-          {item.year   && <span>{item.year}</span>}
-          {item.rating && <span className="card-row-rating">{STAR}{item.rating.toFixed(1)}</span>}
+          {item.year    && <span>{item.year}</span>}
           {item.runtime && <span>{item.runtime} min</span>}
         </div>
         {item.genres.length > 0 && (
@@ -113,9 +106,6 @@ function ListCard({ item, onClick }) {
         <p className="card-list-genre">{item.genres[0]}</p>
       )}
       {item.year && <span className="card-list-year">{item.year}</span>}
-      {item.rating && (
-        <span className="card-list-rating">{STAR}{item.rating.toFixed(1)}</span>
-      )}
     </button>
   );
 }
