@@ -94,9 +94,40 @@ app.get('/api/play', (req, res) => {
 
   const m3u = `#EXTM3U\n#EXTINF:-1,${filename}\n${mediaUrl}\n`;
 
+  // No Content-Disposition: attachment — the browser downloads the tiny file silently
+  // and shows an "Open" notification. First click: Open → VLC → tick "Always open files
+  // of this type". After that VLC launches automatically on every Play click.
   res.setHeader('Content-Type', 'audio/x-mpegurl');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}.m3u"`);
   res.send(m3u);
+});
+
+// GET /api/season-pack?show=tv/Breaking+Bad&season=Season+01
+// Returns an M3U playlist for every episode in one season — opens in VLC as a queue.
+app.get('/api/season-pack', async (req, res) => {
+  if (!req.query.show || !req.query.season) {
+    return res.status(400).json({ error: 'Missing ?show= and/or ?season= parameters' });
+  }
+  try {
+    const lib = await ensureLibrary();
+    const item = getItem(lib, req.query.show);
+    if (!item || !item.seasons) {
+      return res.status(404).json({ error: 'Show or seasons not found' });
+    }
+    const season = item.seasons.find(s => s.name === req.query.season);
+    if (!season) return res.status(404).json({ error: 'Season not found' });
+
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const lines = ['#EXTM3U'];
+    for (const f of season.files) {
+      lines.push(`#EXTINF:-1,${f.name}`);
+      lines.push(`${origin}/media/${f.path}`);
+    }
+
+    res.setHeader('Content-Type', 'audio/x-mpegurl');
+    res.send(lines.join('\n') + '\n');
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // POST /api/rescan — drop cache and rebuild

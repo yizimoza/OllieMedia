@@ -77,8 +77,36 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
   const folderYear  = yearMatch ? parseInt(yearMatch[1], 10) : null;
   const folderTitle = itemName.replace(/\s*\(\d{4}\)$/, '').trim();
 
-  // TV/Anime scan Season subfolders recursively; Movies/Music scan flat
+  // TV/Anime: collect files grouped by season subfolder.
+  // All other categories: flat file list.
   const files = listMediaFiles(itemDir, mediaRoot, isSeries);
+
+  // Build seasons map for TV/Anime: { "Season 01": [file, ...], ... }
+  // Files sitting directly in the show root go into a "specials" bucket.
+  let seasons = null;
+  if (isSeries) {
+    const map = {};
+    for (const f of files) {
+      // f.path is relative to mediaRoot, e.g. "tv/Breaking Bad/Season 01/S01E01.mkv"
+      // We want the immediate subfolder under the show dir.
+      const relToShow = f.path.slice(relPath.length).replace(/^\//, '');
+      const parts = relToShow.split('/');
+      const bucket = parts.length > 1 ? parts[0] : 'Specials';
+      if (!map[bucket]) map[bucket] = [];
+      map[bucket].push(f);
+    }
+    // Sort season buckets: numbered seasons first, then specials/other
+    seasons = Object.keys(map)
+      .sort((a, b) => {
+        const na = a.match(/\d+/);
+        const nb = b.match(/\d+/);
+        if (na && nb) return parseInt(na[0]) - parseInt(nb[0]);
+        if (na) return -1;
+        if (nb) return 1;
+        return a.localeCompare(b);
+      })
+      .map(name => ({ name, files: map[name] }));
+  }
 
   return {
     id:       relPath,
@@ -94,6 +122,7 @@ async function scanItem(itemDir, mediaRoot, categoryName) {
     poster:   posterFile   ? `/art/${relPath}/${posterFile}`   : null,
     backdrop: backdropFile ? `/art/${relPath}/${backdropFile}` : null,
     files,
+    seasons,  // null for non-series; array of { name, files[] } for TV/Anime
   };
 }
 

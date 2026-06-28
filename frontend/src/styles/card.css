@@ -11,11 +11,11 @@
 .media-grid::-webkit-scrollbar-track { background: transparent; }
 .media-grid::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
 
-/* Grid mode — poster cards */
+/* Grid mode — poster cards. 220px minimum keeps cards readable on wide screens. */
 .media-grid--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
   padding: 24px 32px 32px;
 }
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/modal.css';
 
 const AUDIO_EXTS = new Set(['mp3', 'flac', 'm4a', 'aac', 'ogg', 'wav', 'opus']);
@@ -19,6 +19,80 @@ function StarRating({ rating }) {
   );
 }
 
+// Play button — links to M3U endpoint so VLC streams directly from the server.
+// First click: browser shows "Open" in the download bar → pick VLC → tick
+// "Always open files of this type". After that VLC auto-launches every time.
+function PlayBtn({ filePath }) {
+  return (
+    <a
+      className="play-btn"
+      href={`/api/play?path=${encodeURIComponent(filePath)}`}
+      title="Stream in VLC"
+    >
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+      Play
+    </a>
+  );
+}
+
+// Season Pack — M3U of every episode in one season, opens as a queue in VLC.
+function SeasonPackBtn({ showPath, seasonName }) {
+  const href =
+    `/api/season-pack?show=${encodeURIComponent(showPath)}&season=${encodeURIComponent(seasonName)}`;
+  return (
+    <a className="season-pack-btn" href={href} title={`Open all ${seasonName} episodes in VLC`}>
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Season Pack
+    </a>
+  );
+}
+
+// Collapsible season block — header row with season name + pack button, then episode list.
+function SeasonSection({ season, showPath }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="season-section">
+      <div className="season-header">
+        <button
+          className="season-toggle"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+        >
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none"
+            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+            style={{ transform: open ? 'rotate(90deg)' : 'none', transition: '150ms ease' }}>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          {season.name}
+          <span className="season-ep-count">{season.files.length} ep</span>
+        </button>
+        <SeasonPackBtn showPath={showPath} seasonName={season.name} />
+      </div>
+
+      {open && (
+        <ul className="file-list">
+          {season.files.map(f => (
+            <li key={f.path} className="file-item">
+              <span className="file-name">{f.name}</span>
+              <div className="file-actions">
+                <PlayBtn filePath={f.path} />
+                <a className="download-btn" href={`/media/${f.path}`} download>Download</a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function DetailModal({ item, onClose }) {
   // Close on Escape key
   useEffect(() => {
@@ -27,8 +101,9 @@ export default function DetailModal({ item, onClose }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const cat = item.category ? item.category.toLowerCase() : '';
-  const isAudio = cat === 'music' || cat === 'podcasts';
+  const cat      = item.category ? item.category.toLowerCase() : '';
+  const isAudio  = cat === 'music' || cat === 'podcasts';
+  const isSeries = cat === 'tv' || cat === 'anime';
 
   return (
     <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -48,7 +123,6 @@ export default function DetailModal({ item, onClose }) {
             </svg>
           </button>
 
-          {/* Poster thumbnail in hero */}
           {item.poster && (
             <img className="modal-poster" src={item.poster} alt={item.title} />
           )}
@@ -73,7 +147,18 @@ export default function DetailModal({ item, onClose }) {
           {item.studio && <p className="modal-studio">{item.studio}</p>}
           {item.plot   && <p className="modal-plot">{item.plot}</p>}
 
-          {item.files.length > 0 && (
+          {/* TV / Anime: collapsible season sections */}
+          {isSeries && item.seasons && item.seasons.length > 0 && (
+            <div className="modal-files">
+              <h3 className="files-heading">Seasons</h3>
+              {item.seasons.map(season => (
+                <SeasonSection key={season.name} season={season} showPath={item.path} />
+              ))}
+            </div>
+          )}
+
+          {/* Movies / Music / Podcasts: flat file list */}
+          {!isSeries && item.files.length > 0 && (
             <div className="modal-files">
               <h3 className="files-heading">
                 {isAudio ? 'Tracks' : item.files.length === 1 ? 'File' : 'Files'}
@@ -83,7 +168,6 @@ export default function DetailModal({ item, onClose }) {
                   <li key={f.path} className="file-item">
                     <span className="file-name">{f.name}</span>
                     <div className="file-actions">
-                      {/* Inline audio player for music/podcasts */}
                       {isAudio && AUDIO_EXTS.has(f.ext) && (
                         <audio
                           className="audio-player"
@@ -92,31 +176,8 @@ export default function DetailModal({ item, onClose }) {
                           src={`/media/${f.path}`}
                         />
                       )}
-
-                      {/* Video: Play via vlc:// protocol handler.
-                          VLC registers this scheme on install; the browser shows
-                          an "Open with VLC?" prompt (tick "always allow" once). */}
-                      {!isAudio && (() => {
-                        const encodedPath = f.path.split('/').map(encodeURIComponent).join('/');
-                        const vlcUrl = `vlc://${window.location.origin}/media/${encodedPath}`;
-                        return (
-                          <a className="play-btn" href={vlcUrl} title="Open in VLC">
-                            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            Play
-                          </a>
-                        );
-                      })()}
-
-                      {/* Download — always shown */}
-                      <a
-                        className="download-btn"
-                        href={`/media/${f.path}`}
-                        download
-                      >
-                        Download
-                      </a>
+                      {!isAudio && <PlayBtn filePath={f.path} />}
+                      <a className="download-btn" href={`/media/${f.path}`} download>Download</a>
                     </div>
                   </li>
                 ))}
