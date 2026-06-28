@@ -326,8 +326,16 @@
   border-radius: 10px;
 }
 
-/* Season Pack button — distinct teal/muted style so it doesn't compete with Play */
-.season-pack-btn {
+/* Wrapper for the two season-level action buttons */
+.season-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Shared base for Play Season + Download Season */
+.play-season-btn,
+.download-season-btn {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 11px;
@@ -337,13 +345,29 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+/* Play Season — accent gold, mirrors the per-episode Play button */
+.play-season-btn {
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+}
+
+.play-season-btn:hover {
+  background: rgba(229, 192, 123, 0.22);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* Download Season — muted secondary, mirrors the per-episode Download button */
+.download-season-btn {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-secondary);
-  transition: background var(--transition), color var(--transition);
 }
 
-.season-pack-btn:hover {
+.download-season-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
   border-color: rgba(255, 255, 255, 0.14);

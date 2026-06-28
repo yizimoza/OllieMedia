@@ -37,19 +37,33 @@ function PlayBtn({ filePath }) {
   );
 }
 
-// Season Pack — M3U of every episode in one season, opens as a queue in VLC.
-function SeasonPackBtn({ showPath, seasonName }) {
+// Play Season — M3U of the whole season, opens as a queue in VLC.
+function PlaySeasonBtn({ showPath, seasonName }) {
   const href =
     `/api/season-pack?show=${encodeURIComponent(showPath)}&season=${encodeURIComponent(seasonName)}`;
   return (
-    <a className="season-pack-btn" href={href} title={`Open all ${seasonName} episodes in VLC`}>
+    <a className="play-season-btn" href={href} title={`Play all ${seasonName} episodes in VLC`}>
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+      Play Season
+    </a>
+  );
+}
+
+// Download Season — server streams a ZIP of every episode (STORE, no compression).
+function DownloadSeasonBtn({ showPath, seasonName }) {
+  const href =
+    `/api/season-download?show=${encodeURIComponent(showPath)}&season=${encodeURIComponent(seasonName)}`;
+  return (
+    <a className="download-season-btn" href={href} title={`Download all ${seasonName} episodes as ZIP`}>
       <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
         <polyline points="7 10 12 15 17 10" />
         <line x1="12" y1="15" x2="12" y2="3" />
       </svg>
-      Season Pack
+      Download Season
     </a>
   );
 }
@@ -73,7 +87,10 @@ function SeasonSection({ season, showPath }) {
           {season.name}
           <span className="season-ep-count">{season.files.length} ep</span>
         </button>
-        <SeasonPackBtn showPath={showPath} seasonName={season.name} />
+        <div className="season-actions">
+          <PlaySeasonBtn showPath={showPath} seasonName={season.name} />
+          <DownloadSeasonBtn showPath={showPath} seasonName={season.name} />
+        </div>
       </div>
 
       {open && (

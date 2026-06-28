@@ -1,6 +1,7 @@
-const express = require('express');
-const path    = require('path');
-const fs      = require('fs');
+const express  = require('express');
+const path     = require('path');
+const fs       = require('fs');
+const archiver = require('archiver');
 const { buildLibrary, getItem } = require('./scanner');
 
 const app       = express();
@@ -130,6 +131,44 @@ app.get('/api/season-pack', async (req, res) => {
     res.send(lines.join('\n') + '\n');
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/season-download?show=...&season=...
+// Streams a ZIP of every episode in the season. Uses STORE (no compression)
+// since video files are already compressed — faster and same file size.
+app.get('/api/season-download', async (req, res) => {
+  if (!req.query.show || !req.query.season) {
+    return res.status(400).json({ error: 'Missing ?show= and/or ?season= parameters' });
+  }
+  try {
+    const lib = await ensureLibrary();
+    const item = getItem(lib, req.query.show);
+    if (!item || !item.seasons) {
+      return res.status(404).json({ error: 'Show or seasons not found' });
+    }
+    const season = item.seasons.find(s => s.name === req.query.season);
+    if (!season) return res.status(404).json({ error: 'Season not found' });
+
+    const safeName = `${item.title} - ${req.query.season}`.replace(/[\\/:*?"<>|]/g, '_');
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeName}.zip"`);
+
+    const archive = archiver('zip');
+    archive.on('error', err => {
+      console.error('[season-download] Archive error:', err.message);
+      res.destroy(); // headers already sent, so just drop the connection
+    });
+    archive.pipe(res);
+
+    for (const f of season.files) {
+      // store: true = STORE method (no deflate), ideal for already-compressed video
+      archive.file(path.join(MEDIA_ROOT, f.path), { name: f.name, store: true });
+    }
+
+    await archive.finalize();
+  } catch (err) {
+    if (!res.headersSent) res.status(500).json({ error: err.message });
   }
 });
 
