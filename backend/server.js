@@ -186,6 +186,44 @@ app.get('/api/season-download', async (req, res) => {
   }
 });
 
+// GET /api/album-download?artist=music%2FArtist+Name&album=Album+Title
+// Streams a ZIP of every track in the album folder.
+app.get('/api/album-download', async (req, res) => {
+  if (!req.query.artist || !req.query.album) {
+    return res.status(400).json({ error: 'Missing ?artist= and/or ?album= parameters' });
+  }
+  try {
+    const lib = await ensureLibrary();
+    const item = getItem(lib, req.query.artist);
+    if (!item) return res.status(404).json({ error: 'Artist not found' });
+
+    // Keep only files whose path sits inside this album subfolder
+    const albumPrefix = `${req.query.artist}/${req.query.album}/`;
+    const files = item.files.filter(f => f.path.startsWith(albumPrefix));
+    if (files.length === 0) return res.status(404).json({ error: 'Album not found or empty' });
+
+    const safeName = `${item.title} - ${req.query.album}`.replace(/[\\/:*?"<>|]/g, '_');
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeName}.zip"`);
+
+    const archive = archiver('zip');
+    archive.on('error', err => {
+      console.error('[album-download] Archive error:', err.message);
+      res.destroy();
+    });
+    archive.pipe(res);
+
+    for (const f of files) {
+      // store: true = no deflate; audio files are already compressed
+      archive.file(path.join(MEDIA_ROOT, f.path), { name: f.name, store: true });
+    }
+
+    await archive.finalize();
+  } catch (err) {
+    if (!res.headersSent) res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/rescan — force an immediate rescan (same logic as the auto interval)
 app.post('/api/rescan', async (req, res) => {
   try {

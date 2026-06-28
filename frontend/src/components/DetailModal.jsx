@@ -68,6 +68,74 @@ function DownloadSeasonBtn({ showPath, seasonName }) {
   );
 }
 
+// Group a flat file list into albums using the folder segment immediately under the artist dir.
+// Files sitting directly under the artist root (no subfolder) go into a "(Loose Tracks)" bucket.
+function groupByAlbum(files, artistPath) {
+  const map = {};
+  for (const f of files) {
+    const rel = f.path.slice(artistPath.length).replace(/^\//, '');
+    const parts = rel.split('/');
+    const album = parts.length > 1 ? parts[0] : '(Loose Tracks)';
+    if (!map[album]) map[album] = [];
+    map[album].push(f);
+  }
+  return Object.entries(map).map(([name, files]) => ({ name, files }));
+}
+
+// Collapsible album block — heading with track count + download button, then track list.
+function AlbumSection({ album, artistPath }) {
+  const [open, setOpen] = useState(true);
+  const downloadHref =
+    `/api/album-download?artist=${encodeURIComponent(artistPath)}&album=${encodeURIComponent(album.name)}`;
+
+  return (
+    <div className="season-section">
+      <div className="season-header">
+        <button
+          className="season-toggle"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+        >
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none"
+            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+            style={{ transform: open ? 'rotate(90deg)' : 'none', transition: '150ms ease' }}>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          {album.name}
+          <span className="season-ep-count">{album.files.length} track{album.files.length !== 1 ? 's' : ''}</span>
+        </button>
+        <div className="season-actions">
+          <a className="download-season-btn" href={downloadHref} title="Download album as ZIP">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Album
+          </a>
+        </div>
+      </div>
+
+      {open && (
+        <ul className="file-list">
+          {album.files.map(f => (
+            <li key={f.path} className="file-item">
+              <span className="file-name">{f.name}</span>
+              <div className="file-actions">
+                {AUDIO_EXTS.has(f.ext) && (
+                  <audio className="audio-player" controls preload="none" src={`/media/${f.path}`} />
+                )}
+                <a className="download-btn" href={`/media/${f.path}`} download>Download</a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // Collapsible season block — header row with season name + pack button, then episode list.
 function SeasonSection({ season, showPath }) {
   const [open, setOpen] = useState(true);
@@ -176,26 +244,26 @@ export default function DetailModal({ item, onClose }) {
             </div>
           )}
 
-          {/* Movies / Music / Podcasts: flat file list */}
-          {!isSeries && item.files.length > 0 && (
+          {/* Music / Podcasts: tracks grouped by album subfolder */}
+          {isAudio && item.files.length > 0 && (
             <div className="modal-files">
-              <h3 className="files-heading">
-                {isAudio ? 'Tracks' : item.files.length === 1 ? 'File' : 'Files'}
-              </h3>
+              <h3 className="files-heading">Albums</h3>
+              {groupByAlbum(item.files, item.path).map(album => (
+                <AlbumSection key={album.name} album={album} artistPath={item.path} />
+              ))}
+            </div>
+          )}
+
+          {/* Movies: flat file list */}
+          {!isSeries && !isAudio && item.files.length > 0 && (
+            <div className="modal-files">
+              <h3 className="files-heading">{item.files.length === 1 ? 'File' : 'Files'}</h3>
               <ul className="file-list">
                 {item.files.map(f => (
                   <li key={f.path} className="file-item">
                     <span className="file-name">{f.name}</span>
                     <div className="file-actions">
-                      {isAudio && AUDIO_EXTS.has(f.ext) && (
-                        <audio
-                          className="audio-player"
-                          controls
-                          preload="none"
-                          src={`/media/${f.path}`}
-                        />
-                      )}
-                      {!isAudio && <PlayBtn filePath={f.path} />}
+                      <PlayBtn filePath={f.path} />
                       <a className="download-btn" href={`/media/${f.path}`} download>Download</a>
                     </div>
                   </li>
