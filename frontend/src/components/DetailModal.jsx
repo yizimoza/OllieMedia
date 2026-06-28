@@ -180,30 +180,43 @@ function SeasonSection({ season, showPath }) {
   );
 }
 
-// Copies the UNC path for this item to the clipboard so the user can paste it
-// into Windows Explorer. Direct file:// links to UNC paths are blocked by browsers.
+// Opens the item folder in Windows Explorer via a file:// UNC link.
+// Format: file:////server/share/path  (4 slashes = UNC host prefix)
+// Works in Edge by default. Chrome requires enabling Allow file:// access in flags.
+// If the browser blocks it, clicking also copies the UNC path as a fallback.
 function OpenFolderBtn({ itemPath, smbPath }) {
   const [copied, setCopied] = useState(false);
   if (!smbPath) return null;
 
-  // Build \\server\share\Category\Title from the forward-slash relative path
-  const uncPath = smbPath.replace(/\//g, '\\') + '\\' + itemPath.replace(/\//g, '\\');
+  // Build the file:// URI: strip any trailing backslash from smbPath, convert to forward
+  // slashes, prefix with file:////, then append the item path.
+  const base = smbPath.replace(/\\/g, '/').replace(/\/$/, '');
+  const fileUri = 'file:////' + base.replace(/^\/+/, '') + '/' + itemPath;
+
+  // UNC path for the clipboard fallback (paste into Explorer address bar)
+  const uncPath = smbPath.replace(/\//g, '\\').replace(/\\$/, '') + '\\' + itemPath.replace(/\//g, '\\');
 
   function handleClick() {
+    // Copy UNC path as fallback in case the browser blocks the file:// link
     navigator.clipboard.writeText(uncPath).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
-    });
+    }).catch(() => {});
   }
 
   return (
-    <button className="open-folder-btn" onClick={handleClick} title={uncPath}>
+    <a
+      className="open-folder-btn"
+      href={fileUri}
+      title={`Open in Explorer: ${uncPath}`}
+      onClick={handleClick}
+    >
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
       </svg>
       {copied ? 'Path copied!' : 'Open Folder'}
-    </button>
+    </a>
   );
 }
 

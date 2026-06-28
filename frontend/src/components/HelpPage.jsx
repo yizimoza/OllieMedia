@@ -101,8 +101,8 @@ export default function HelpPage() {
         <h2>Open Folder (Windows Explorer)</h2>
         <p>
           Movie and TV detail panels include an <strong>Open Folder</strong> button. Clicking it
-          copies the UNC path for that item to your clipboard — paste it into the Windows Explorer
-          address bar to jump straight to the folder on your NAS.
+          opens the item's folder directly in Windows Explorer via a <code>file://</code> network
+          link. It also copies the UNC path to your clipboard as a fallback.
         </p>
         <p>
           To enable this, set the <code>SMB_PATH</code> variable in your <code>docker-compose.yml</code>
@@ -112,13 +112,18 @@ export default function HelpPage() {
   - SMB_PATH=\\\\192.168.1.120\\media`}</pre>
         <p>
           Replace <code>192.168.1.120</code> with your NAS IP and <code>media</code> with
-          your actual share name. On Synology, the share name is usually the folder name
-          you set up in Control Panel → Shared Folders.
+          your actual share name. On Synology, the share name is set up in
+          Control Panel → Shared Folders.
         </p>
-        <p>
-          When you paste the path into Explorer for the first time, Windows will prompt for
-          credentials if the share requires them. Check <em>Remember my credentials</em> to
-          avoid being asked again.
+        <p className="help-note">
+          <strong>Browser compatibility:</strong> Edge opens <code>file://</code> network links
+          by default. In Chrome, go to <code>chrome://flags</code> and enable
+          <em> Allow file:// access for pages loaded over network</em>. Firefox blocks these
+          links — use the copied UNC path instead (paste into Explorer's address bar).
+        </p>
+        <p className="help-note">
+          If Windows prompts for credentials when you first open the share, enter your NAS
+          username and password and check <em>Remember my credentials</em>.
         </p>
       </section>
 
