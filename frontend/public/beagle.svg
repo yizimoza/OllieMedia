@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Ears (behind head) -->
+  <ellipse cx="21" cy="58" rx="15" ry="27" fill="#3b1f08" transform="rotate(-12 21 58)"/>
+  <ellipse cx="79" cy="58" rx="15" ry="27" fill="#3b1f08" transform="rotate(12 79 58)"/>
+  <!-- Head -->
+  <ellipse cx="50" cy="50" rx="30" ry="28" fill="#c8984a"/>
+  <!-- Saddle marking (classic beagle dark forehead patch) -->
+  <path d="M22 38 Q50 20 78 38 Q66 50 50 46 Q34 50 22 38Z" fill="#3b1f08"/>
+  <!-- White muzzle -->
+  <ellipse cx="50" cy="63" rx="19" ry="14" fill="#f0e0b8"/>
+  <!-- Eyes -->
+  <circle cx="37" cy="50" r="6" fill="#1a0800"/>
+  <circle cx="63" cy="50" r="6" fill="#1a0800"/>
+  <!-- Eye shine -->
+  <circle cx="39.5" cy="48" r="2" fill="white" opacity="0.9"/>
+  <circle cx="65.5" cy="48" r="2" fill="white" opacity="0.9"/>
+  <!-- Nose -->
+  <ellipse cx="50" cy="61" rx="7.5" ry="5.5" fill="#1a0800"/>
+  <!-- Nose highlight -->
+  <ellipse cx="47.5" cy="59" rx="2.2" ry="1.5" fill="#555" opacity="0.6"/>
+</svg>

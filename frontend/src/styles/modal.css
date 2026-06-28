@@ -1,0 +1,262 @@
+/* ── Modal overlay ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.80);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+  animation: fade-in 180ms ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal panel ── */
+.modal-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: slide-up 220ms ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-hover) transparent;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Hero / backdrop section ── */
+.modal-hero {
+  position: relative;
+  min-height: 220px;
+  background: var(--bg-card) center / cover no-repeat;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.modal-hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.15) 0%,
+    rgba(10,10,15,0.92) 100%
+  );
+  pointer-events: none;
+}
+
+/* Close button — top-right */
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background var(--transition), color var(--transition);
+  z-index: 1;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: rgba(229, 192, 123, 0.15);
+  color: var(--accent);
+}
+
+/* Small poster thumbnail in hero */
+.modal-poster {
+  position: relative;
+  z-index: 1;
+  width: 80px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  align-self: flex-end;
+}
+
+/* Title + meta text in hero */
+.modal-hero-text {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  color: var(--text-primary);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+.modal-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-tag {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 2px 9px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+/* Star rating */
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent);
+}
+
+.rating-num {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Genre chips */
+.modal-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.genre-chip {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  border-radius: 20px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── Body section ── */
+.modal-body {
+  padding: 22px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-studio {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-plot {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* ── File list ── */
+.modal-files { display: flex; flex-direction: column; gap: 10px; }
+
+.files-heading {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.file-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Inline audio player */
+.audio-player {
+  height: 28px;
+  width: 200px;
+  accent-color: var(--accent);
+}
+
+/* Open / Download button */
+.open-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  border-radius: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.open-btn:hover {
+  background: rgba(229, 192, 123, 0.22);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
