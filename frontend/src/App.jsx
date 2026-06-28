@@ -17,7 +17,11 @@ export default function App() {
   const [loading, setLoading]           = useState(false);
   const [showHelp, setShowHelp]         = useState(false);
   const [viewMode, setViewMode]         = useState(
-    () => localStorage.getItem('om-view') || 'grid'
+    () => {
+      const saved = localStorage.getItem('om-view');
+      const valid = ['spotlight', 'flip', 'shelf', 'row', 'list'];
+      return valid.includes(saved) ? saved : 'spotlight';
+    }
   );
   const [sortKey, setSortKey]           = useState(
     () => localStorage.getItem('om-sort-key') || 'alpha'
@@ -48,8 +52,7 @@ export default function App() {
       let va, vb;
       if (sortKey === 'year')     { va = a.year          ?? 0; vb = b.year          ?? 0; }
       if (sortKey === 'episodes') { va = a.files?.length  ?? 0; vb = b.files?.length  ?? 0; }
-      if (sortKey === 'rating')   { va = a.rating         ?? 0; vb = b.rating         ?? 0; }
-      if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          ?? 0; }
+if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          ?? 0; }
       return sortDir === 'asc' ? va - vb : vb - va;
     });
     return sorted;

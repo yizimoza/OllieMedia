@@ -1,13 +1,42 @@
 const VIEWS = [
   {
-    id: 'grid',
-    label: 'Grid',
+    id: 'spotlight',
+    label: 'Spotlight',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <rect x="2"  y="2"  width="9" height="9" rx="1.5"/>
-        <rect x="13" y="2"  width="9" height="9" rx="1.5"/>
-        <rect x="2"  y="13" width="9" height="9" rx="1.5"/>
-        <rect x="13" y="13" width="9" height="9" rx="1.5"/>
+        <rect x="1"  y="2"  width="6" height="9" rx="1"/>
+        <rect x="9"  y="2"  width="6" height="9" rx="1"/>
+        <rect x="17" y="2"  width="6" height="9" rx="1"/>
+        <rect x="1"  y="13" width="6" height="9" rx="1"/>
+        <rect x="9"  y="13" width="6" height="9" rx="1"/>
+        <rect x="17" y="13" width="6" height="9" rx="1"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'flip',
+    label: 'Flip',
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="14" height="18" rx="2" fill="currentColor"/>
+        <path d="M19 8c2 0 3 1.8 3 4s-1 4-3 4" stroke="currentColor" strokeWidth="1.8"/>
+        <polyline points="17 13 20 16 17 19" stroke="currentColor" strokeWidth="1.8"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'shelf',
+    label: 'Shelf',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <rect x="1"  y="2"  width="5" height="7" rx="1"/>
+        <rect x="7"  y="2"  width="5" height="7" rx="1"/>
+        <rect x="13" y="2"  width="5" height="7" rx="1"/>
+        <rect x="19" y="2"  width="4" height="7" rx="1" opacity="0.35"/>
+        <rect x="1"  y="12" width="5" height="7" rx="1"/>
+        <rect x="7"  y="12" width="5" height="7" rx="1"/>
+        <rect x="13" y="12" width="5" height="7" rx="1"/>
+        <rect x="19" y="12" width="4" height="7" rx="1" opacity="0.35"/>
       </svg>
     ),
   },

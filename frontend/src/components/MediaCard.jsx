@@ -1,10 +1,9 @@
 import '../styles/card.css';
 
-
-// Small thumbnail used in row + list views
-function Thumb({ poster, title, className }) {
+// Reusable poster image with fallback initial
+function PosterImg({ poster, title, placeholderClass }) {
   return (
-    <div className={className}>
+    <>
       {poster ? (
         <img
           src={poster}
@@ -17,62 +16,80 @@ function Thumb({ poster, title, className }) {
         />
       ) : null}
       <div
-        className="thumb-placeholder"
+        className={placeholderClass}
         style={{ display: poster ? 'none' : 'flex' }}
         aria-hidden="true"
       >
         {title.charAt(0).toUpperCase()}
       </div>
+    </>
+  );
+}
+
+// Small thumbnail used in row + list views
+function Thumb({ poster, title, className }) {
+  return (
+    <div className={className}>
+      <PosterImg poster={poster} title={title} placeholderClass="thumb-placeholder" />
     </div>
   );
 }
 
-// ── Grid card (poster dominant, 2:3 aspect ratio) ───────────────────────────
-function GridCard({ item, onClick, isAudio }) {
+// ── Spotlight card (poster-only; siblings dim on hover) ──────────────────────
+function SpotlightCard({ item, onClick }) {
   return (
-    <button className="media-card" onClick={onClick} aria-label={`Open ${item.title}`}>
-      <div className="card-art">
-        {item.poster ? (
-          <img
-            src={item.poster}
-            alt={item.title}
-            loading="lazy"
-            onError={e => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div
-          className="card-placeholder-wrap"
-          style={{ display: item.poster ? 'none' : 'flex' }}
-        >
-          <div className="card-placeholder">
-            <span className="placeholder-initial">{item.title.charAt(0).toUpperCase()}</span>
-          </div>
+    <button className="media-card--spotlight" onClick={onClick} aria-label={`Open ${item.title}`}>
+      <PosterImg poster={item.poster} title={item.title} placeholderClass="spotlight-placeholder" />
+      <div className="spotlight-overlay">
+        <p className="spotlight-title">{item.title}</p>
+        <div className="spotlight-meta">
+          {item.year    && <span>{item.year}</span>}
+          {item.runtime && <span>{item.runtime}m</span>}
         </div>
-        <div className="card-overlay">
-          <p className="hover-title">{item.title}</p>
-          <div className="hover-meta">
-            {item.year    && <span className="hover-year">{item.year}</span>}
-            {item.runtime && <span className="hover-runtime">{item.runtime}m</span>}
+        {item.genres.length > 0 && (
+          <div className="spotlight-genres">
+            {item.genres.slice(0, 3).map(g => (
+              <span key={g} className="spotlight-genre">{g}</span>
+            ))}
           </div>
-          {item.genres.length > 0 && (
-            <div className="hover-genres">
-              {item.genres.slice(0, 3).map(g => (
-                <span key={g} className="hover-genre">{g}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="card-info">
-        <p className="card-title">{item.title}</p>
-        {isAudio && item.files.length > 0 && (
-          <p className="card-sub">{item.files.length} track{item.files.length !== 1 ? 's' : ''}</p>
         )}
       </div>
     </button>
+  );
+}
+
+// ── Flip card (rotates 180° on hover to show info on the back) ───────────────
+function FlipCard({ item, onClick }) {
+  return (
+    <div
+      className="flip-card"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${item.title}`}
+      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()}
+    >
+      <div className="flip-inner">
+        <div className="flip-front">
+          <PosterImg poster={item.poster} title={item.title} placeholderClass="flip-front-placeholder" />
+        </div>
+        <div className="flip-back">
+          <h3 className="flip-back-title">{item.title}</h3>
+          <div className="flip-back-meta">
+            {item.year    && <span>{item.year}</span>}
+            {item.runtime && <span>{item.runtime}m</span>}
+          </div>
+          {item.genres.length > 0 && (
+            <div className="flip-back-genres">
+              {item.genres.slice(0, 3).map(g => (
+                <span key={g} className="flip-back-genre">{g}</span>
+              ))}
+            </div>
+          )}
+          {item.plot && <p className="flip-back-plot">{item.plot}</p>}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -111,11 +128,9 @@ function ListCard({ item, onClick }) {
 }
 
 // ── Root export ──────────────────────────────────────────────────────────────
-export default function MediaCard({ item, viewMode = 'grid', onClick }) {
-  const cat = item.category ? item.category.toLowerCase() : '';
-  const isAudio = cat === 'music' || cat === 'podcasts';
-
-  if (viewMode === 'row')  return <RowCard  item={item} onClick={onClick} />;
-  if (viewMode === 'list') return <ListCard item={item} onClick={onClick} />;
-  return <GridCard item={item} onClick={onClick} isAudio={isAudio} />;
+export default function MediaCard({ item, viewMode = 'spotlight', onClick }) {
+  if (viewMode === 'spotlight') return <SpotlightCard item={item} onClick={onClick} />;
+  if (viewMode === 'flip')      return <FlipCard      item={item} onClick={onClick} />;
+  if (viewMode === 'list')      return <ListCard      item={item} onClick={onClick} />;
+  return <RowCard item={item} onClick={onClick} />;
 }
