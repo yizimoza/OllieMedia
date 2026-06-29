@@ -9,6 +9,9 @@ const PAGE_SIZES = [10, 25, 50];
 // Only poster-grid views are paginated; row/list/shelf render everything
 const PAGINATED = new Set(['spotlight', 'flip']);
 
+// Minimum column width (px) for the auto-fill grid at each zoom level (1–5)
+const GRID_MIN_PX = [120, 140, 160, 190, 220];
+
 export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSelect, tileZoom = 3 }) {
   const [pageSize, setPageSize] = useState(() => {
     const saved = parseInt(localStorage.getItem('om-page-size'), 10);
@@ -39,13 +42,19 @@ export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSe
   }
 
   if (viewMode === 'shelf')  return <ShelfView items={items} onSelect={onSelect} tileZoom={tileZoom} />;
-  if (viewMode === 'recent') return <RecentlyAddedView               onSelect={onSelect} />;
+  if (viewMode === 'recent') return <RecentlyAddedView onSelect={onSelect} tileZoom={tileZoom} />;
 
   const paginate = PAGINATED.has(viewMode);
   const totalPages = paginate ? Math.ceil(items.length / pageSize) : 1;
   const visibleItems = paginate
     ? items.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : items;
+
+  // For spotlight/flip, override the grid column minimum based on zoom level
+  const z = Math.max(0, Math.min(4, tileZoom - 1));
+  const gridStyle = paginate
+    ? { gridTemplateColumns: `repeat(auto-fill, minmax(${GRID_MIN_PX[z]}px, 1fr))` }
+    : undefined;
 
   function handlePageSize(size) {
     localStorage.setItem('om-page-size', size);
@@ -54,9 +63,9 @@ export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSe
 
   return (
     <div className="grid-wrapper">
-      <div className={`media-grid media-grid--${viewMode}`}>
+      <div className={`media-grid media-grid--${viewMode}`} style={gridStyle}>
         {visibleItems.map(item => (
-          <MediaCard key={item.id} item={item} viewMode={viewMode} onClick={() => onSelect(item)} />
+          <MediaCard key={item.id} item={item} viewMode={viewMode} onClick={() => onSelect(item)} tileZoom={tileZoom} />
         ))}
       </div>
 

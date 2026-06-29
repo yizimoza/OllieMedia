@@ -1,5 +1,13 @@
 import '../styles/card.css';
 
+// Thumbnail widths (px) for row view at each zoom level (1–5)
+const ROW_THUMB_W = [48, 56, 64, 80, 96];
+// Card min-heights (px) for row view at each zoom level
+const ROW_CARD_H  = [72, 84, 96, 112, 128];
+// Thumbnail widths (px) for list view (2:3 ratio, height derived)
+const LIST_THUMB_W = [22, 27, 32, 40, 48];
+const LIST_THUMB_H = [33, 40, 48, 60, 72];
+
 // Reusable poster image with fallback initial
 function PosterImg({ poster, title, placeholderClass }) {
   return (
@@ -27,15 +35,16 @@ function PosterImg({ poster, title, placeholderClass }) {
 }
 
 // Small thumbnail used in row + list views
-function Thumb({ poster, title, className }) {
+function Thumb({ poster, title, className, style }) {
   return (
-    <div className={className}>
+    <div className={className} style={style}>
       <PosterImg poster={poster} title={title} placeholderClass="thumb-placeholder" />
     </div>
   );
 }
 
 // ── Spotlight card (poster-only; siblings dim on hover) ──────────────────────
+// Sized by the grid's auto-fill columns — no per-card size overrides needed
 function SpotlightCard({ item, onClick }) {
   return (
     <button className="media-card--spotlight" onClick={onClick} aria-label={`Open ${item.title}`}>
@@ -59,6 +68,7 @@ function SpotlightCard({ item, onClick }) {
 }
 
 // ── Flip card (rotates 180° on hover to show info on the back) ───────────────
+// Sized by the grid's auto-fill columns — no per-card size overrides needed
 function FlipCard({ item, onClick }) {
   return (
     <div
@@ -94,10 +104,20 @@ function FlipCard({ item, onClick }) {
 }
 
 // ── Row card (thumbnail left, metadata right) ────────────────────────────────
-function RowCard({ item, onClick }) {
+function RowCard({ item, onClick, thumbW, cardH }) {
   return (
-    <button className="media-card media-card--row" onClick={onClick} aria-label={`Open ${item.title}`}>
-      <Thumb poster={item.poster} title={item.title} className="card-row-thumb" />
+    <button
+      className="media-card media-card--row"
+      onClick={onClick}
+      aria-label={`Open ${item.title}`}
+      style={{ minHeight: `${cardH}px` }}
+    >
+      <Thumb
+        poster={item.poster}
+        title={item.title}
+        className="card-row-thumb"
+        style={{ width: `${thumbW}px` }}
+      />
       <div className="card-row-body">
         <p className="card-row-title">{item.title}</p>
         <div className="card-row-meta">
@@ -114,10 +134,15 @@ function RowCard({ item, onClick }) {
 }
 
 // ── List card (ultra-compact rows) ──────────────────────────────────────────
-function ListCard({ item, onClick }) {
+function ListCard({ item, onClick, thumbW, thumbH }) {
   return (
     <button className="media-card media-card--list" onClick={onClick} aria-label={`Open ${item.title}`}>
-      <Thumb poster={item.poster} title={item.title} className="card-list-thumb" />
+      <Thumb
+        poster={item.poster}
+        title={item.title}
+        className="card-list-thumb"
+        style={{ width: `${thumbW}px`, height: `${thumbH}px` }}
+      />
       <p className="card-list-title">{item.title}</p>
       {item.genres.length > 0 && (
         <p className="card-list-genre">{item.genres[0]}</p>
@@ -128,9 +153,10 @@ function ListCard({ item, onClick }) {
 }
 
 // ── Root export ──────────────────────────────────────────────────────────────
-export default function MediaCard({ item, viewMode = 'spotlight', onClick }) {
+export default function MediaCard({ item, viewMode = 'spotlight', onClick, tileZoom = 3 }) {
+  const z = Math.max(0, Math.min(4, tileZoom - 1)); // clamp to 0–4 index
   if (viewMode === 'spotlight') return <SpotlightCard item={item} onClick={onClick} />;
   if (viewMode === 'flip')      return <FlipCard      item={item} onClick={onClick} />;
-  if (viewMode === 'list')      return <ListCard      item={item} onClick={onClick} />;
-  return <RowCard item={item} onClick={onClick} />;
+  if (viewMode === 'list')      return <ListCard item={item} onClick={onClick} thumbW={LIST_THUMB_W[z]} thumbH={LIST_THUMB_H[z]} />;
+  return <RowCard item={item} onClick={onClick} thumbW={ROW_THUMB_W[z]} cardH={ROW_CARD_H[z]} />;
 }

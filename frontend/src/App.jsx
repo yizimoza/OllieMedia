@@ -141,23 +141,21 @@ if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          
               <div className="header-controls">
                 <SortControl sortKey={sortKey} sortDir={sortDir} onChange={handleSortChange} />
                 <ViewToggle mode={viewMode} onChange={handleViewChange} />
-                {/* Zoom control — only visible in shelf view */}
-                {viewMode === 'shelf' && (
-                  <div className="zoom-control" title="Tile size">
-                    <button
-                      className="zoom-btn"
-                      onClick={() => handleZoomChange(tileZoom - 1)}
-                      disabled={tileZoom <= 1}
-                      aria-label="Decrease tile size"
-                    >−</button>
-                    <button
-                      className="zoom-btn"
-                      onClick={() => handleZoomChange(tileZoom + 1)}
-                      disabled={tileZoom >= 5}
-                      aria-label="Increase tile size"
-                    >+</button>
-                  </div>
-                )}
+                {/* Tile size zoom — shown in all views */}
+                <div className="zoom-control" title="Tile size">
+                  <button
+                    className="zoom-btn"
+                    onClick={() => handleZoomChange(tileZoom - 1)}
+                    disabled={tileZoom <= 1}
+                    aria-label="Decrease tile size"
+                  >−</button>
+                  <button
+                    className="zoom-btn"
+                    onClick={() => handleZoomChange(tileZoom + 1)}
+                    disabled={tileZoom >= 5}
+                    aria-label="Increase tile size"
+                  >+</button>
+                </div>
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
               </div>
             </header>

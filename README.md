@@ -1,25 +1,44 @@
 # OllieMedia
 
-A self-hosted LAN media browser. Browse your local library of movies, TV, anime, music, and podcasts from any device on your home network. Runs as a single Docker container on a Synology NAS (or any Linux host).
+A self-hosted LAN media browser for your home network. Point it at your media folder, and browse movies, TV, anime, music, and podcasts from any device — phone, tablet, TV browser, or desktop. Runs as a single Docker container.
 
 ![OllieMedia screenshot](screenshot.png)
 
 ## Features
 
-- Dark, cinematic card-based UI
-- Auto-discovers categories from your media folder structure
-- Reads local poster art (`poster.jpg`, `backdrop.jpg`, `cover.jpg`) for card thumbnails
-- Reads Kodi-format `.nfo` files for title, year, rating, genres, and synopsis
-- **Play** button — opens video files directly in VLC via M3U playlist
+**Library**
+- Auto-discovers categories from your top-level folder structure
+- Reads local poster and backdrop art (`poster.jpg`, `backdrop.jpg`, `cover.jpg`)
+- Reads Kodi-format `.nfo` files for title, year, runtime, genres, and plot
+- Rescan without restarting the container
+
+**Views** — switch between six layouts per category:
+| View | Description |
+|---|---|
+| Recently Added | Hero cards showing the last 5 items added across all categories |
+| Spotlight | Poster grid — hover spotlights one card and dims the rest |
+| Flip | Poster grid — hover flips the card to reveal plot and metadata |
+| Shelf | Netflix-style horizontal rows grouped by genre |
+| Row | Comfortable list with poster thumbnail and synopsis |
+| List | Ultra-compact single-line rows |
+
+**Playback**
+- **Play** button — streams directly to VLC via M3U playlist
 - **Download** button — saves the file to your device
 - Inline HTML5 audio player for music and podcasts
+
+**UX**
+- **Tile zoom** — `−` / `+` buttons in the header scale card sizes across all views (5 levels, persists across sessions)
+- **Shelf nav arrows** — click `‹` / `›` on any shelf row to page through without using the scrollbar
+- Sort by title, year, episode count, or date added (ascending or descending)
 - Live search within each category
-- Rescans library without a container restart
+- Three themes: Dark, Light, Beagle
+- Traefik-ready with labels out of the box
 
 ## Requirements
 
 - Docker + Docker Compose on the host
-- Media mounted at `/volume1/media/` (configurable via `MEDIA_ROOT` env var)
+- Media mounted at `/volume1/media/` (configurable via `MEDIA_ROOT`)
 - VLC installed on client devices for the Play button
 
 ## Quick Start
@@ -27,10 +46,10 @@ A self-hosted LAN media browser. Browse your local library of movies, TV, anime,
 ```bash
 git clone https://github.com/yizimoza/OllieMedia.git
 cd OllieMedia
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
-Then open `http://YOUR-HOST-IP:3000` in a browser.
+Open `http://YOUR-HOST-IP:3000` in a browser.
 
 ## Media Folder Structure
 
@@ -39,16 +58,16 @@ Then open `http://YOUR-HOST-IP:3000` in a browser.
   Movies/
     Title (Year)/
       Title (Year).mkv
-      poster.jpg        ← card art
-      backdrop.jpg      ← detail background
-      movie.nfo         ← Kodi XML metadata
+      poster.jpg          ← card art
+      backdrop.jpg        ← detail modal background
+      movie.nfo           ← Kodi XML metadata
   TV/
     Show Name/
       poster.jpg
       tvshow.nfo
       Season 01/
         Show - S01E01 - Title.mkv
-  Anime/             ← same structure as TV
+  Anime/                  ← same structure as TV
   Music/
     Artist/
       Album (Year)/
@@ -57,21 +76,22 @@ Then open `http://YOUR-HOST-IP:3000` in a browser.
   Podcasts/
     Podcast Name/
       cover.jpg
-      2024-01-15 - Episode.mp3
+      2024-01-15 - Episode Title.mp3
 ```
 
-See the **Setup Guide** page in the app sidebar for the full NFO format reference.
+See the **Setup Guide** page in the app sidebar for the full NFO field reference.
 
 ## Configuration
 
 | Variable | Default | Description |
 |---|---|---|
-| `MEDIA_ROOT` | `/volume1/media` | Path to your media library |
+| `MEDIA_ROOT` | `/volume1/media` | Path to your media library inside the container |
 | `PORT` | `3000` | Port the server listens on |
+| `SMB_PATH` | _(unset)_ | SMB root for the "Open Folder" button (e.g. `\\192.168.1.120\media`). When set, clicking Open Folder copies a UNC path Windows Explorer can navigate directly. |
 
 ## Rescan Library
 
-After adding new media, trigger a fresh scan without restarting:
+After adding new media, trigger a fresh scan without restarting the container:
 
 ```bash
 curl -X POST http://YOUR-HOST-IP:3000/api/rescan
@@ -79,4 +99,4 @@ curl -X POST http://YOUR-HOST-IP:3000/api/rescan
 
 ## First-time Play button setup
 
-The Play button downloads a tiny `.m3u` playlist file that points VLC at the video stream. On first use, your browser will ask what to open `.m3u` files with — select VLC and check "always use this app" to make future clicks seamless.
+The Play button generates a `.m3u` playlist that tells VLC to stream the file from the server. On first use your browser will ask what to open `.m3u` files with — select VLC and check "always use this app" so future clicks are seamless.

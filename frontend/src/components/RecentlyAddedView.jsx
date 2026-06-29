@@ -8,7 +8,11 @@ const CAT_GRADIENT = {
   anime:  'linear-gradient(120deg, #2e0a1a 0%, #1a0a2e 100%)',
 };
 
-export default function RecentlyAddedView({ onSelect }) {
+// Poster widths (px) and card min-heights (px) at each zoom level (1–5)
+const POSTER_W = [65, 75, 85, 100, 115];
+const CARD_H   = [130, 150, 170, 200, 230];
+
+export default function RecentlyAddedView({ onSelect, tileZoom = 3 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +42,10 @@ export default function RecentlyAddedView({ onSelect }) {
     );
   }
 
+  const z = Math.max(0, Math.min(4, tileZoom - 1));
+  const posterW = POSTER_W[z];
+  const cardH   = CARD_H[z];
+
   return (
     <div className="recent-container">
       <p className="recent-subtitle">
@@ -55,16 +63,17 @@ export default function RecentlyAddedView({ onSelect }) {
             className="recent-card"
             onClick={() => onSelect(item)}
             aria-label={`Open ${item.title}`}
-            style={bg}
+            style={{ ...bg, minHeight: `${cardH}px` }}
           >
             <div className="recent-card-scrim" />
-            <div className="recent-card-content">
+            <div className="recent-card-content" style={{ minHeight: `${cardH}px` }}>
               {item.poster && (
                 <img
                   className="recent-card-poster"
                   src={item.poster}
                   alt={item.title}
                   loading="lazy"
+                  style={{ width: `${posterW}px` }}
                 />
               )}
               <div className="recent-card-body">
