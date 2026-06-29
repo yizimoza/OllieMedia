@@ -202,6 +202,45 @@ body {
   border-color: var(--border-accent);
 }
 
+/* ── Tile zoom control (shelf view) ── */
+.zoom-control {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.zoom-btn {
+  width: 30px;
+  height: 33px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+  padding: 0;
+}
+
+/* Divider between − and + */
+.zoom-btn + .zoom-btn { border-left: 1px solid var(--border); }
+
+.zoom-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+.zoom-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 /* ── Search bar ── */
 .search-wrap {
   position: relative;

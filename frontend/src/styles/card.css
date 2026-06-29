@@ -435,21 +435,56 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* .shelf-track wraps the scroll container plus its left/right nav arrows */
+.shelf-track {
+  display: flex;
+  align-items: stretch;
+  padding: 0 32px;
+}
+
+/* Left/right arrow buttons that page through a shelf without using the scrollbar */
+.shelf-arrow {
+  flex-shrink: 0;
+  width: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  padding: 0;
+}
+
+.shelf-arrow--left  { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.shelf-arrow--right { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+.shelf-arrow:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--border-accent);
+}
+
 .shelf-scroll {
+  flex: 1;
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding: 4px 32px 12px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--bg-hover) transparent;
+  /* No left/right padding — .shelf-track handles the 32px inset via its own padding */
+  padding: 4px 8px 12px;
+  /* Thicker scrollbar so it is easier to grab */
+  scrollbar-color: var(--bg-hover) var(--border);
 }
 
-.shelf-scroll::-webkit-scrollbar        { height: 4px; }
-.shelf-scroll::-webkit-scrollbar-track  { background: transparent; }
-.shelf-scroll::-webkit-scrollbar-thumb  { background: var(--bg-hover); border-radius: 2px; }
+.shelf-scroll::-webkit-scrollbar        { height: 8px; }
+.shelf-scroll::-webkit-scrollbar-track  { background: var(--border); border-radius: 4px; }
+.shelf-scroll::-webkit-scrollbar-thumb  { background: var(--bg-hover); border-radius: 4px; }
 
 .shelf-card {
   flex-shrink: 0;
+  /* Width is set inline via the tileZoom prop; this is the fallback */
   width: 130px;
   aspect-ratio: 2 / 3;
   position: relative;

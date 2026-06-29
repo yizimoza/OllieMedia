@@ -9,7 +9,7 @@ const PAGE_SIZES = [10, 25, 50];
 // Only poster-grid views are paginated; row/list/shelf render everything
 const PAGINATED = new Set(['spotlight', 'flip']);
 
-export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSelect }) {
+export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSelect, tileZoom = 3 }) {
   const [pageSize, setPageSize] = useState(() => {
     const saved = parseInt(localStorage.getItem('om-page-size'), 10);
     return PAGE_SIZES.includes(saved) ? saved : 50;
@@ -38,7 +38,7 @@ export default function MediaGrid({ items, loading, viewMode = 'spotlight', onSe
     );
   }
 
-  if (viewMode === 'shelf')  return <ShelfView          items={items} onSelect={onSelect} />;
+  if (viewMode === 'shelf')  return <ShelfView items={items} onSelect={onSelect} tileZoom={tileZoom} />;
   if (viewMode === 'recent') return <RecentlyAddedView               onSelect={onSelect} />;
 
   const paginate = PAGINATED.has(viewMode);

@@ -39,6 +39,13 @@ export default function App() {
   const [sortDir, setSortDir]           = useState(
     () => localStorage.getItem('om-sort-dir') || 'asc'
   );
+  // Tile zoom: 1=smallest … 5=largest, default 3 (maps to card widths 90/110/130/160/200px)
+  const [tileZoom, setTileZoom]         = useState(
+    () => {
+      const saved = parseInt(localStorage.getItem('om-tile-zoom'), 10);
+      return saved >= 1 && saved <= 5 ? saved : 3;
+    }
+  );
 
   function handleViewChange(mode) {
     setViewMode(mode);
@@ -50,6 +57,12 @@ export default function App() {
     setSortDir(dir);
     localStorage.setItem('om-sort-key', key);
     localStorage.setItem('om-sort-dir', dir);
+  }
+
+  function handleZoomChange(level) {
+    const clamped = Math.max(1, Math.min(5, level));
+    setTileZoom(clamped);
+    localStorage.setItem('om-tile-zoom', clamped);
   }
 
   function sortItems(list) {
@@ -128,6 +141,23 @@ if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          
               <div className="header-controls">
                 <SortControl sortKey={sortKey} sortDir={sortDir} onChange={handleSortChange} />
                 <ViewToggle mode={viewMode} onChange={handleViewChange} />
+                {/* Zoom control — only visible in shelf view */}
+                {viewMode === 'shelf' && (
+                  <div className="zoom-control" title="Tile size">
+                    <button
+                      className="zoom-btn"
+                      onClick={() => handleZoomChange(tileZoom - 1)}
+                      disabled={tileZoom <= 1}
+                      aria-label="Decrease tile size"
+                    >−</button>
+                    <button
+                      className="zoom-btn"
+                      onClick={() => handleZoomChange(tileZoom + 1)}
+                      disabled={tileZoom >= 5}
+                      aria-label="Increase tile size"
+                    >+</button>
+                  </div>
+                )}
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
               </div>
             </header>
@@ -136,6 +166,7 @@ if (sortKey === 'mtime')    { va = a.mtime          ?? 0; vb = b.mtime          
               loading={loading}
               viewMode={viewMode}
               onSelect={setSelectedItem}
+              tileZoom={tileZoom}
             />
           </>
         )}
