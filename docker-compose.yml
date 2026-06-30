@@ -13,6 +13,17 @@ services:
       - PORT=3000
       # UNC path prefix for the "Open Folder" button in the UI.
       # Set this to the SMB root of your media share so the button copies a path
-      # Windows Explorer can navigate to directly (e.g. \\192.168.1.120\media).
-      - SMB_PATH=\\192.168.1.120\media
+      # Windows Explorer can navigate to directly (e.g. \\192.168.1.61\media).
+      - SMB_PATH=\\192.168.1.61\media
     restart: unless-stopped
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.olliemedia.rule=Host(`ollie.home`)"
+      - "traefik.http.routers.olliemedia.entrypoints=web"
+      - "traefik.http.services.olliemedia.loadbalancer.server.port=3000"
+
+networks:
+  traefik-net:
+    external: true
