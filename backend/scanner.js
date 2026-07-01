@@ -8,10 +8,13 @@ const AUDIO_EXTS = new Set(['.mp3', '.flac', '.m4a', '.aac', '.ogg', '.wav', '.o
 const MEDIA_EXTS = new Set([...VIDEO_EXTS, ...AUDIO_EXTS]);
 const SUBTITLE_EXTS = new Set(['.srt', '.vtt', '.ass', '.ssa', '.sub']);
 
+const ENGLISH_TAGS = new Set(['en', 'eng', 'english']);
+
 // Find a subtitle file sitting next to a video file, matching by basename.
 // Handles both exact matches ("S01E01.srt") and language-tagged matches
 // ("S01E01.en.srt") by requiring the subtitle name to start with the video's
-// basename (extension stripped).
+// basename (extension stripped). When multiple subtitles match, an
+// English-tagged one ("*.en.srt", "*.eng.srt") is preferred over others.
 function findSubtitle(dirPath, videoBaseName) {
   let entries;
   try {
@@ -19,12 +22,19 @@ function findSubtitle(dirPath, videoBaseName) {
   } catch {
     return null;
   }
-  const match = entries.find(name => {
+  const matches = entries.filter(name => {
     const ext = path.extname(name).toLowerCase();
     if (!SUBTITLE_EXTS.has(ext)) return false;
     return path.basename(name, ext).startsWith(videoBaseName);
   });
-  return match || null;
+  if (matches.length === 0) return null;
+
+  const english = matches.find(name => {
+    const ext = path.extname(name).toLowerCase();
+    const tag = path.basename(name, ext).slice(videoBaseName.length).replace(/^\./, '').toLowerCase();
+    return ENGLISH_TAGS.has(tag);
+  });
+  return english || matches[0];
 }
 
 // Artwork filenames checked in priority order

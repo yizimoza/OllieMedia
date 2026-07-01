@@ -113,7 +113,9 @@ app.get('/api/subtitle', async (req, res) => {
 // GET /api/play?path=... — returns an M3U playlist pointing at the media file's HTTP URL.
 // The browser downloads the tiny .m3u file; VLC (set as default .m3u handler) opens it
 // and streams the file directly from this server. If a matching subtitle file exists,
-// an #EXTVLCOPT:sub-file line tells VLC to load it automatically.
+// an #EXTVLCOPT:input-slave line tells VLC to load it automatically. (sub-file only
+// accepts a local filesystem path; input-slave is the option VLC supports for remote
+// subtitle/audio URLs.)
 app.get('/api/play', async (req, res) => {
   if (!req.query.path) return res.status(400).json({ error: 'Missing ?path= parameter' });
 
@@ -128,7 +130,7 @@ app.get('/api/play', async (req, res) => {
     const lib = await ensureLibrary();
     const file = getFile(lib, req.query.path);
     if (file && file.subtitle) {
-      subLine = `#EXTVLCOPT:sub-file=${origin}/media/${file.subtitle}\n`;
+      subLine = `#EXTVLCOPT:input-slave=${origin}/media/${file.subtitle}\n`;
     }
   } catch {
     // Subtitle lookup is best-effort; missing it shouldn't block playback.
@@ -162,7 +164,7 @@ app.get('/api/season-pack', async (req, res) => {
     const lines = ['#EXTM3U'];
     for (const f of season.files) {
       lines.push(`#EXTINF:-1,${f.name}`);
-      if (f.subtitle) lines.push(`#EXTVLCOPT:sub-file=${origin}/media/${f.subtitle}`);
+      if (f.subtitle) lines.push(`#EXTVLCOPT:input-slave=${origin}/media/${f.subtitle}`);
       lines.push(`${origin}/media/${f.path}`);
     }
 
