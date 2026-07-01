@@ -97,19 +97,6 @@ app.get('/api/item', async (req, res) => {
   }
 });
 
-// GET /api/subtitle?path=... — download the subtitle file associated with a video.
-app.get('/api/subtitle', async (req, res) => {
-  if (!req.query.path) return res.status(400).json({ error: 'Missing ?path= parameter' });
-  try {
-    const lib = await ensureLibrary();
-    const file = getFile(lib, req.query.path);
-    if (!file || !file.subtitle) return res.status(404).json({ error: 'No subtitle found for this file' });
-    res.redirect(`/media/${file.subtitle}`);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // GET /api/play?path=... — returns an M3U playlist pointing at the media file's HTTP URL.
 // The browser downloads the tiny .m3u file; VLC (set as default .m3u handler) opens it
 // and streams the file directly from this server. If a matching subtitle file exists,
