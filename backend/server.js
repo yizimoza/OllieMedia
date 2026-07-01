@@ -2,7 +2,7 @@ const express  = require('express');
 const path     = require('path');
 const fs       = require('fs');
 const archiver = require('archiver');
-const { buildLibrary, getItem } = require('./scanner');
+const { buildLibrary, getItem, getFile } = require('./scanner');
 
 const app       = express();
 const PORT      = process.env.PORT || 3000;
@@ -97,18 +97,44 @@ app.get('/api/item', async (req, res) => {
   }
 });
 
+// GET /api/subtitle?path=... — download the subtitle file associated with a video.
+app.get('/api/subtitle', async (req, res) => {
+  if (!req.query.path) return res.status(400).json({ error: 'Missing ?path= parameter' });
+  try {
+    const lib = await ensureLibrary();
+    const file = getFile(lib, req.query.path);
+    if (!file || !file.subtitle) return res.status(404).json({ error: 'No subtitle found for this file' });
+    res.redirect(`/media/${file.subtitle}`);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/play?path=... — returns an M3U playlist pointing at the media file's HTTP URL.
 // The browser downloads the tiny .m3u file; VLC (set as default .m3u handler) opens it
-// and streams the file directly from this server.
-app.get('/api/play', (req, res) => {
+// and streams the file directly from this server. If a matching subtitle file exists,
+// an #EXTVLCOPT:sub-file line tells VLC to load it automatically.
+app.get('/api/play', async (req, res) => {
   if (!req.query.path) return res.status(400).json({ error: 'Missing ?path= parameter' });
 
   // Build the full HTTP URL to the media file using the incoming request's host header
   // so the playlist works regardless of what IP or hostname the client used to reach us.
-  const mediaUrl = `${req.protocol}://${req.get('host')}/media/${req.query.path}`;
+  const origin = `${req.protocol}://${req.get('host')}`;
+  const mediaUrl = `${origin}/media/${req.query.path}`;
   const filename = path.basename(req.query.path);
 
-  const m3u = `#EXTM3U\n#EXTINF:-1,${filename}\n${mediaUrl}\n`;
+  let subLine = '';
+  try {
+    const lib = await ensureLibrary();
+    const file = getFile(lib, req.query.path);
+    if (file && file.subtitle) {
+      subLine = `#EXTVLCOPT:sub-file=${origin}/media/${file.subtitle}\n`;
+    }
+  } catch {
+    // Subtitle lookup is best-effort; missing it shouldn't block playback.
+  }
+
+  const m3u = `#EXTM3U\n#EXTINF:-1,${filename}\n${subLine}${mediaUrl}\n`;
 
   // inline (not attachment) skips the Save dialog; the .m3u extension lets Windows
   // hand the file to VLC automatically if VLC is the default .m3u handler.
@@ -136,6 +162,7 @@ app.get('/api/season-pack', async (req, res) => {
     const lines = ['#EXTM3U'];
     for (const f of season.files) {
       lines.push(`#EXTINF:-1,${f.name}`);
+      if (f.subtitle) lines.push(`#EXTVLCOPT:sub-file=${origin}/media/${f.subtitle}`);
       lines.push(`${origin}/media/${f.path}`);
     }
 

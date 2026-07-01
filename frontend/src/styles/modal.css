@@ -284,8 +284,8 @@
   accent-color: var(--accent);
 }
 
-/* Shared base for both action buttons */
-.play-btn, .download-btn {
+/* Shared base for all per-file action buttons */
+.play-btn, .download-btn, .subtitle-btn {
   font-size: 0.78rem;
   font-weight: 600;
   padding: 5px 13px;
@@ -318,6 +318,19 @@
 }
 
 .download-btn:hover {
+  background: var(--bg-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+/* Subtitle — same muted secondary style as Download */
+.subtitle-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.subtitle-btn:hover {
   background: var(--bg-hover);
   border-color: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);

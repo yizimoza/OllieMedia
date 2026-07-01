@@ -6,6 +6,26 @@ const { parseNfo } = require('./nfo');
 const VIDEO_EXTS = new Set(['.mkv', '.mp4', '.avi', '.mov', '.wmv', '.m4v', '.ts', '.m2ts', '.webm']);
 const AUDIO_EXTS = new Set(['.mp3', '.flac', '.m4a', '.aac', '.ogg', '.wav', '.opus']);
 const MEDIA_EXTS = new Set([...VIDEO_EXTS, ...AUDIO_EXTS]);
+const SUBTITLE_EXTS = new Set(['.srt', '.vtt', '.ass', '.ssa', '.sub']);
+
+// Find a subtitle file sitting next to a video file, matching by basename.
+// Handles both exact matches ("S01E01.srt") and language-tagged matches
+// ("S01E01.en.srt") by requiring the subtitle name to start with the video's
+// basename (extension stripped).
+function findSubtitle(dirPath, videoBaseName) {
+  let entries;
+  try {
+    entries = fs.readdirSync(dirPath);
+  } catch {
+    return null;
+  }
+  const match = entries.find(name => {
+    const ext = path.extname(name).toLowerCase();
+    if (!SUBTITLE_EXTS.has(ext)) return false;
+    return path.basename(name, ext).startsWith(videoBaseName);
+  });
+  return match || null;
+}
 
 // Artwork filenames checked in priority order
 const POSTER_NAMES   = ['poster.jpg',  'poster.jpeg',  'poster.png',  'folder.jpg'];
@@ -54,7 +74,12 @@ function listMediaFiles(dirPath, mediaRoot, recursive) {
       const ext = path.extname(entry.name).toLowerCase();
       if (MEDIA_EXTS.has(ext)) {
         const rel = path.relative(mediaRoot, full).replace(/\\/g, '/');
-        files.push({ name: entry.name, path: rel, ext: ext.slice(1) });
+        const videoBaseName = path.basename(entry.name, ext);
+        const subtitleName = findSubtitle(dirPath, videoBaseName);
+        const subtitlePath = subtitleName
+          ? path.relative(mediaRoot, path.join(dirPath, subtitleName)).replace(/\\/g, '/')
+          : null;
+        files.push({ name: entry.name, path: rel, ext: ext.slice(1), subtitle: subtitlePath });
       }
     }
   }
@@ -199,4 +224,21 @@ function getItem(library, itemPath) {
   return null;
 }
 
-module.exports = { buildLibrary, getItem };
+// Locate a single media file by its relative path across all items (flat files and season files)
+function getFile(library, filePath) {
+  for (const items of Object.values(library)) {
+    for (const item of items) {
+      const flat = item.files && item.files.find(f => f.path === filePath);
+      if (flat) return flat;
+      if (item.seasons) {
+        for (const season of item.seasons) {
+          const found = season.files.find(f => f.path === filePath);
+          if (found) return found;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+module.exports = { buildLibrary, getItem, getFile };

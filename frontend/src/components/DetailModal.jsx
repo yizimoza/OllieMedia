@@ -22,6 +22,25 @@ function PlayBtn({ filePath }) {
   );
 }
 
+// Download Subtitle — links straight to the matching .srt/.vtt/.ass file, if one exists.
+function SubtitleBtn({ subtitlePath }) {
+  return (
+    <a
+      className="subtitle-btn"
+      href={`/media/${subtitlePath}`}
+      download
+      title="Download subtitle"
+    >
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 5h16v14H4z" />
+        <path d="M7 15h4M13 15h4M7 10h10" />
+      </svg>
+      Subtitle
+    </a>
+  );
+}
+
 // Play Season — M3U of the whole season, opens as a queue in VLC.
 function PlaySeasonBtn({ showPath, seasonName }) {
   const href =
@@ -156,6 +175,7 @@ function SeasonSection({ season, showPath }) {
               <div className="file-actions">
                 <PlayBtn filePath={f.path} />
                 <a className="download-btn" href={`/media/${f.path}`} download>Download</a>
+                {f.subtitle && <SubtitleBtn subtitlePath={f.subtitle} />}
               </div>
             </li>
           ))}
